@@ -1,0 +1,10 @@
+spring:
+  batch:
+    job:
+      names: ${job.name:NONE}
+    jdbc:
+      initialize-schema: always
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop # 새로 생성 후, 테스트가 끝나면 테이블들 Drop
