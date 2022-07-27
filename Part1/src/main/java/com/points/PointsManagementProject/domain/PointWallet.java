@@ -22,4 +22,8 @@ public class PointWallet extends IdEntity {
         this.amount = amount;
         this.userId = userId;
     }
+
+    public void updateAmount(Long amount) {
+        this.amount = amount;
+    }
 }
