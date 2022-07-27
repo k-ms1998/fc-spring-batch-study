@@ -51,7 +51,9 @@ public class ExpirePointStepConfig {
     }
 
     /**
-     * ItemReader 구현
+     * ItemReader 구현:
+     * DB에 저장된 Point 들 중에서 , 이미 만료 일자가 지났고, 사용되지 않았으며, 현재 만료가 되지 않았다는 상태의 Point 들 가져오기
+     * 
      * @param entityManagerFactory
      * @param today : @Value("#{T(java.time.LocalDate).parse(jobParameters[today]} 로 String "YYYY-MM--DD" 형식으로 받은 날짜를 LocalDate 를 변환
      * @return
@@ -71,7 +73,11 @@ public class ExpirePointStepConfig {
     }
 
     /**
-     * ItemProcessor 구현
+     * ItemProcessor 구현:
+     * 1. ItemReader 에서 기져온 포인트들은 만료 일자가 지났기 때문에 만료 상태로 바꿔줘야됨
+     *  ->만료 상태로 바꿔주는 작업을 ItemProcessor 에서 구현
+     * 2. 해당 포인트들이 담긴 PointWallet 에서 해당 Point 들의 금액을 PointWallet 의 적립 금액에서 빼기
+     * 
      * @return
      */
     @Bean
@@ -90,7 +96,9 @@ public class ExpirePointStepConfig {
     }
 
     /**
-     * ItemWriter 구현
+     * ItemWriter 구현:
+     * ItemProcessor 에서 값들을 업데이트 해준 Point 랑 PointWallet 을 다시 DB에 저장
+     * 
      * @param pointRepository
      * @param pointWalletRepository
      * @return
