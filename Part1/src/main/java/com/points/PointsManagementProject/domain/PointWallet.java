@@ -16,9 +16,9 @@ public class PointWallet extends IdEntity {
     Long amount;    // 보유 금액
 
     @Column(name = "user_id")
-    Long userId; // 유저 Id
+    String userId; // 유저 Id
 
-    public PointWallet(Long amount, Long userId) {
+    public PointWallet(Long amount, String userId) {
         this.amount = amount;
         this.userId = userId;
     }
