@@ -46,6 +46,15 @@ public class Point extends IdEntity {
         this.isExpired = false;
     }
 
+    public Point(Long amount, LocalDate earnedDate, LocalDate expiredDate, PointWallet pointWallet, boolean isExpired) {
+        this.amount = amount;
+        this.earnedDate = earnedDate;
+        this.expiredDate = expiredDate;
+        this.pointWallet = pointWallet;
+        this.isUsed = false;
+        this.isExpired = isExpired;
+    }
+
     public void expire() {
         this.isExpired = true;
     }

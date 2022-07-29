@@ -12,6 +12,7 @@ import org.springframework.batch.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -48,15 +49,15 @@ class MessageExpiredPointJobConfigTest extends BatchTestSupport {
         /**
          * PointWallet2 에는 어제 2000 포인트 만료 됨
          */
-        pointRepository.save(new Point(1000L , earnDate, expireDate, pointWallet2));
-        pointRepository.save(new Point(1000L , earnDate, expireDate, pointWallet2));
+        pointRepository.save(new Point(1000L, earnDate, expireDate, pointWallet2, true));
+        pointRepository.save(new Point(1000L, earnDate, expireDate, pointWallet2, true));
 
         /**
          * PointWallet1 에는 어제 3000 포인트 만료 됨
          */
-        pointRepository.save(new Point(1000L , earnDate, expireDate, pointWallet1));
-        pointRepository.save(new Point(1000L , earnDate, expireDate, pointWallet1));
-        pointRepository.save(new Point(1000L , earnDate, expireDate, pointWallet1));
+        pointRepository.save(new Point(1000L, earnDate, expireDate, pointWallet1, true));
+        pointRepository.save(new Point(1000L, earnDate, expireDate, pointWallet1, true));
+        pointRepository.save(new Point(1000L, earnDate, expireDate, pointWallet1, true));
 
         pointRepository.save(new Point(1000L , earnDate, notExpireDate,pointWallet1));
         pointRepository.save(new Point(1000L , earnDate, notExpireDate,pointWallet1));
@@ -82,12 +83,12 @@ class MessageExpiredPointJobConfigTest extends BatchTestSupport {
         Message message1 = messages.stream().filter(item -> item.getUserId().equals("user1")).findFirst().orElseGet(null);
         then(message1).isNotNull();
         then(message1.getTitle()).isEqualTo("3000 포인트 만료");
-        then(message1.getContent()).isEqualTo("2021-09-06 기준 3000 포인트가 만료되었습니다.");
+        then(message1.getContent()).isEqualTo("2022-07-06 기준 3000 포인트가 만료되었습니다.");
         
         Message message2 = messages.stream().filter(item -> item.getUserId().equals("user2")).findFirst().orElseGet(null);
         then(message2).isNotNull();
         then(message2.getTitle()).isEqualTo("2000 포인트 만료");
-        then(message2.getContent()).isEqualTo("2021-09-06 기준 2000 포인트가 만료되었습니다.");
+        then(message2.getContent()).isEqualTo("2022-07-06 기준 2000 포인트가 만료되었습니다.");
     }
 
 }
