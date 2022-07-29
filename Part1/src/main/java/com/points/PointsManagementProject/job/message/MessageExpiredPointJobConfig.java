@@ -14,10 +14,10 @@ public class MessageExpiredPointJobConfig {
     @Bean
     public Job messageExpiredPointJob(JobBuilderFactory jobBuilderFactory,
                                       JobTodayParameterValidator validator,
-                                      Step messageExpiredPointJob) {
+                                      Step messageExpiredPointStep) {
         return jobBuilderFactory
                 .get("messageExpiredPointJob")
-                .start(messageExpiredPointJob)
+                .start(messageExpiredPointStep)
                 .validator(validator)
                 .incrementer(new RunIdIncrementer())
                 .build();
