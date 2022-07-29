@@ -67,4 +67,33 @@ public class PointRepositoryCustomImpl extends QuerydslRepositorySupport impleme
                 result, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), fetchCount);
     }
 
+    /**
+     * alarmCriteriaDate 날짜 이내에 만료 예정인 포인트들 조회하기
+     *
+     * @param alarmCriteriaDate
+     * @param pageable
+     * @return
+     */
+    @Override
+    public Page<ExpiredPointSummary> sumBeforeCriteriaDate(LocalDate alarmCriteriaDate, Pageable pageable) {
+        JPQLQuery<ExpiredPointSummary> query = from(point)
+                .select(
+                        new QExpiredPointSummary(
+                                point.pointWallet.userId,
+                                point.amount.sum().coalesce(0L)
+                        )
+                ).where(point.isExpired.eq(false))
+                .where(point.isUsed.eq(false))
+                .where(point.expiredDate.loe(alarmCriteriaDate))
+                .groupBy(point.pointWallet);
+
+        /**
+         * 실제 Query 에 Paging 한 결과 가져오기
+         */
+        List<ExpiredPointSummary> result = getQuerydsl().applyPagination(pageable, query).fetch();
+        Long fetchCount = query.fetchCount();
+        return new PageImpl<>(
+                result, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), fetchCount);
+    }
+
 }
