@@ -18,8 +18,6 @@ import java.util.List;
 
 public class PointRepositoryCustomImpl extends QuerydslRepositorySupport implements PointRepositoryCustom{
 
-    static private QPoint point = QPoint.point;
-
     public PointRepositoryCustomImpl() {
         super(Point.class);
     }
@@ -39,6 +37,7 @@ public class PointRepositoryCustomImpl extends QuerydslRepositorySupport impleme
      */
     @Override
     public Page<ExpiredPointSummary> sumByExpiredDate(LocalDate alarmCriteriaDate, Pageable pageable) {
+        QPoint point = QPoint.point;
         /**
          * 1. Query 결과는 ExpiredPointSummary 로 받기 위해 select 에 ExpiredPointSummary 생성자로 받아서 개발
          * 2. QueryDsl 에서 생성자를 사용하기 위해서는 생성자에 @QueryProjection 애노테이션 추가
@@ -76,6 +75,8 @@ public class PointRepositoryCustomImpl extends QuerydslRepositorySupport impleme
      */
     @Override
     public Page<ExpiredPointSummary> sumBeforeCriteriaDate(LocalDate alarmCriteriaDate, Pageable pageable) {
+        QPoint point = QPoint.point;
+
         JPQLQuery<ExpiredPointSummary> query = from(point)
                 .select(
                         new QExpiredPointSummary(
@@ -94,6 +95,19 @@ public class PointRepositoryCustomImpl extends QuerydslRepositorySupport impleme
         Long fetchCount = query.fetchCount();
         return new PageImpl<>(
                 result, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), fetchCount);
+    }
+
+    @Override
+    public Page<Point> findPointToExpire(LocalDate today, Pageable pageable) {
+        QPoint point = QPoint.point;
+
+        JPQLQuery<Point> query = from(point)
+                .select(point)
+                .where(point.expiredDate.lt(today), point.isUsed.eq(false), point.isExpired.eq(false));
+        List<Point> points = getQuerydsl().applyPagination(pageable, query).fetch();
+        Long count = query.fetchCount();
+
+        return new PageImpl<>(points, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), count);
     }
 
 }

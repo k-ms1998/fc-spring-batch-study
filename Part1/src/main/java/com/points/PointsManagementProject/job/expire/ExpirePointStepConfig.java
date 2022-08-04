@@ -2,6 +2,8 @@ package com.points.PointsManagementProject.job.expire;
 
 import com.points.PointsManagementProject.domain.Point;
 import com.points.PointsManagementProject.domain.PointWallet;
+import com.points.PointsManagementProject.job.readerCustom.ReverseJpaPagingItemReader;
+import com.points.PointsManagementProject.job.readerCustom.ReverseJpaPagingItemReaderBuilder;
 import com.points.PointsManagementProject.repository.PointRepository;
 import com.points.PointsManagementProject.repository.PointWalletRepository;
 import org.springframework.batch.core.Step;
@@ -15,6 +17,7 @@ import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilde
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
@@ -36,7 +39,7 @@ public class ExpirePointStepConfig {
     @Bean
     @JobScope // Job 에서 Step 을 실행할 떄 Lazy 하게 생성
     public Step expirePointStep(StepBuilderFactory stepBuilderFactory, PlatformTransactionManager platformTransactionManager,
-                                JpaPagingItemReader<Point> expirePointItemReader, ItemProcessor<Point, Point> expirePointProcessor,
+                                ReverseJpaPagingItemReader<Point> expirePointItemReader, ItemProcessor<Point, Point> expirePointProcessor,
                                 ItemWriter<Point> expirePointWriter) {
 
         return stepBuilderFactory
@@ -53,22 +56,19 @@ public class ExpirePointStepConfig {
     /**
      * ItemReader 구현:
      * DB에 저장된 Point 들 중에서 , 이미 만료 일자가 지났고, 사용되지 않았으며, 현재 만료가 되지 않았다는 상태의 Point 들 가져오기
-     * 
-     * @param entityManagerFactory
+     *
      * @param today : @Value("#{T(java.time.LocalDate).parse(jobParameters[today]} 로 String "YYYY-MM--DD" 형식으로 받은 날짜를 LocalDate 를 변환
      * @return
      */
     @Bean
     @StepScope // Step 이 아래의 ItemReader 를 Lazy 하게 생성
-    public JpaPagingItemReader<Point> expirePointItemReader(EntityManagerFactory entityManagerFactory,
+    public ReverseJpaPagingItemReader<Point> expirePointItemReader(PointRepository pointRepository,
                                                             @Value("#{T(java.time.LocalDate).parse(jobParameters[today])}") LocalDate today) {
-
-        return new JpaPagingItemReaderBuilder<Point>()
+        return new ReverseJpaPagingItemReaderBuilder<Point>()
                 .name("expirePointItemReader")
-                .entityManagerFactory(entityManagerFactory)
-                .queryString("select p from Point p where p.expiredDate < :today and isUsed = false and isExpired = false") // JPQL 로 쿼리 작성 => 나중에 QueryDsl 로 변환 할 것
-                .parameterValues(Map.of("today", today))    // JPQL 에서 :today 에 toady 값 넣어줌
-                .pageSize(1000) // 한 개의 페이지의 사이즈
+                .query(pageable -> pointRepository.findPointToExpire(today, pageable)) // JPQL -> QueryDSL 로 변경
+                .pageSize(1) // 한 개의 페이지의 사이즈
+                .sort(Sort.by(Sort.Direction.ASC, "id"))
                 .build();
     }
 
