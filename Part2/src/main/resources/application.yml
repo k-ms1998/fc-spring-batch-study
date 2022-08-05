@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    active: local
+  batch:
+    job:
+      names: ${job.name:NONE}
+    jdbc:
+      initialize-schema: always
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    platform: mysql
+    url: jdbc:mysql://127.0.0.1:33060/house
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: house
+    password: house
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
