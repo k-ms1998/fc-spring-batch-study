@@ -6,6 +6,7 @@ import com.points.PointsManagementProject.domain.PointWallet;
 import com.points.PointsManagementProject.repository.PointRepository;
 import com.points.PointsManagementProject.repository.PointReservationRepository;
 import com.points.PointsManagementProject.repository.PointWalletRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,17 @@ class ReservationPointJobConfigTest extends BatchTestSupport {
 
     @Autowired
     private PointReservationRepository pointReservationRepository;
+
+    /**
+     * 각 테스트가 종료 될때마다 실행
+     * -> 각 테스트 종료마다 각 테이블에 저장된 값들 삭제 (주의: FK Constraints 에 의해 삭제 순서 중요)
+     */
+    @AfterEach
+    public void tearDown() {
+        pointRepository.deleteAll();
+        pointReservationRepository.deleteAll();
+        pointWalletRepository.deleteAll();
+    }
 
     @Test
     void given_whenExecutingReservationPointJob_then() throws Exception{
