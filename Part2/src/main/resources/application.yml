@@ -8,7 +8,6 @@ spring:
       initialize-schema: always
 
 ---
-
 spring:
   config:
     activate:
@@ -25,3 +24,11 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    database: h2
