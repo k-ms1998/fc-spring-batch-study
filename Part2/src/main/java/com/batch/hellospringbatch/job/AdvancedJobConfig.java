@@ -3,8 +3,7 @@ package com.batch.hellospringbatch.job;
 import com.batch.hellospringbatch.job.validator.LocalDateParameterValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -27,13 +26,47 @@ public class AdvancedJobConfig {
     private final StepBuilderFactory stepBuilderFactory;
 
     @Bean("advancedJob")
-    public Job advancedJob(Step advancedStep) {
+    public Job advancedJob(Step advancedStep, JobExecutionListener advancedJobExecutionListener) {
         return jobBuilderFactory
                 .get("advancedJob")
                 .validator(new LocalDateParameterValidator("targetDate")) // 'targetDate' 가 null 인지 && 올바른 형식인지 validate
+                .listener(advancedJobExecutionListener)
                 .incrementer(new RunIdIncrementer())
                 .start(advancedStep)
                 .build();
+    }
+
+    @Bean
+    @JobScope
+    public JobExecutionListener advancedJobExecutionListener() {
+        return new JobExecutionListener() {
+            /**
+             * Job 이 실행되지 전의 상태
+             *
+             * @param jobExecution
+             */
+            @Override
+            public void beforeJob(JobExecution jobExecution) {
+                log.info("[JobExecutionListener#beforeJob : Advanced Job] JobExecution is " + jobExecution.getStatus());
+            }
+
+            /**
+             * Job 이 실행된 이후의 상태
+             * Job 이 실행된 이후, 상태에 따라서 구현하고 싶은 로직이 있을때 afterJob 에서 구현
+             *
+             * ex) 만약에 Job 이 실패해서 관리자한테 알림을 보내고 싶은 경우:
+             *      -> Listener 의 afterJob 에서 로직 구현
+             *
+             * @param jobExecution
+             */
+            @Override
+            public void afterJob(JobExecution jobExecution) {
+                log.info("[JobExecutionListener#beforeJob : Advanced Job] JobExecution is " + jobExecution.getStatus());
+                if(jobExecution.getStatus() == BatchStatus.FAILED){
+                    log.error("[JobExecutionListener#beforeJob : Advanced Job ERROR] !! JobExecution FAILED !!");
+                }
+            }
+        };
     }
 
     @Bean
@@ -60,6 +93,18 @@ public class AdvancedJobConfig {
             LocalDate parsedDate = LocalDate.parse(targetDate);
             log.info("[Advanced Job] Job Parameter : targetDate = " + targetDate);
             log.info("[Advanced Job] Executed Tasklet");
+
+            /**
+             * 만약에 targetDate 는 무조건 오늘보다 나중인 날짜이어야 될때:
+             * targetDate 가 오늘보다 빠른 날짜이면 Exception
+             *  -> JobExecution 의 status == Failed
+             *      => Job Listener 의 afterJob 에서 Failed 일때의 로직 처리
+             *          => log.error("[JobExecutionListener#beforeJob : Advanced Job ERROR] !! JobExecution FAILED !!");
+             *              => '[JobExecutionListener#beforeJob : Advanced Job] !! JobExecution FAILED !!'
+             */
+            if (parsedDate.isBefore(LocalDate.now())) {
+                throw new RuntimeException();
+            }
             return RepeatStatus.FINISHED;
         };
     }
