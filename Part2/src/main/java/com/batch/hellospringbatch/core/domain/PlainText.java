@@ -1,12 +1,15 @@
 package com.batch.hellospringbatch.core.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @Table(name = "plain_text")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlainText {
 
     @Id
@@ -15,6 +18,10 @@ public class PlainText {
 
     @Column(nullable = false)
     private String text;
+
+    public PlainText(String text) {
+        this.text = text;
+    }
 
     public void updateText(String text) {
         this.text = text;
