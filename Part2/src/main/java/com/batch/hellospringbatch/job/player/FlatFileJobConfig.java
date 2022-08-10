@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -60,6 +61,9 @@ public class FlatFileJobConfig {
                         items.forEach(System.out::println);
                     }
                 })
+                .allowStartIfComplete(true) // BATCH_JOB_EXECUTION 테이블에 동일한 JOB_INSTANCE_ID 를 가진 튜플에 status 가 COMPLETED 인 경우 Step 재실행 X 
+                                                // -> 'Step already complete or not restartable, so no action to execute'
+                                                // 그러므로, 1. Parameter 을 항상 새로 설정(ex: LocalDateTime.now()) or 2. allowStartIfComplete(true) 추가
                 .build();
     }
 
