@@ -15,12 +15,18 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.adapter.ItemProcessorAdapter;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
+import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
+import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,18 +55,14 @@ public class FlatFileJobConfig {
     @Bean
     @JobScope
     public Step flatFileStep(FlatFileItemReader<PlayerDto> flatFileItemReader,
-                             ItemProcessorAdapter<PlayerDto, PlayerSalaryDto> playerSalaryDtoItemProcessorAdapter) {
+                             ItemProcessorAdapter<PlayerDto, PlayerSalaryDto> playerSalaryDtoItemProcessorAdapter,
+                             FlatFileItemWriter<PlayerSalaryDto> playerSalaryDtoFlatFileItemWriter) {
         return stepBuilderFactory
                 .get("flatFileStep")
                 .<PlayerDto, PlayerSalaryDto>chunk(5)
                 .reader(flatFileItemReader)
                 .processor(playerSalaryDtoItemProcessorAdapter)
-                .writer(new ItemWriter<PlayerSalaryDto>() {
-                    @Override
-                    public void write(List<? extends PlayerSalaryDto> items) throws Exception {
-                        items.forEach(System.out::println);
-                    }
-                })
+                .writer(playerSalaryDtoFlatFileItemWriter)
                 .allowStartIfComplete(true) // BATCH_JOB_EXECUTION 테이블에 동일한 JOB_INSTANCE_ID 를 가진 튜플에 status 가 COMPLETED 인 경우 Step 재실행 X 
                                                 // -> 'Step already complete or not restartable, so no action to execute'
                                                 // 그러므로, 1. Parameter 을 항상 새로 설정(ex: LocalDateTime.now()) or 2. allowStartIfComplete(true) 추가
@@ -96,5 +98,32 @@ public class FlatFileJobConfig {
          */
 
         return adapter;
+    }
+
+    @Bean
+    @StepScope
+    public FlatFileItemWriter<PlayerSalaryDto> playerSalaryDtoFlatFileItemWriter() throws IOException {
+        /**
+         * Entity 에서 Write 하고 싶은 필드명들 명시하기
+         */
+        BeanWrapperFieldExtractor<PlayerSalaryDto> fieldExtractor = new BeanWrapperFieldExtractor<>();
+        fieldExtractor.setNames(new String[]{"ID", "firstName", "lastName", "salary"}); // PlayerSalaryDto 중에서 파일에 Write 할 필드 명들을 명시 해줌 -> 명시한 순서대로 Write 됨
+        fieldExtractor.afterPropertiesSet();
+
+        /**
+         * 데이터를 어떻게 조합할지 정해주기
+         * ex: 위의 fieldExtractor 에서 명시해준 필드 순서대로 하면 : ID|firstName|lastName|salary 가 Write 됨
+         */
+        DelimitedLineAggregator<PlayerSalaryDto> delimitedLineAggregator = new DelimitedLineAggregator<>();
+        delimitedLineAggregator.setDelimiter("|"); // 필드 간 구분을 어떻게 할지 명시 -> field1|field2|field3|....
+        delimitedLineAggregator.setFieldExtractor(fieldExtractor);
+
+        new File("player-salary-list.txt").createNewFile(); // createNexFile() -> Job 이 실행 될때마다 파일을 새로 만들어서 Write -> 전에 Write 했던 데이터들 사라짐
+
+        return new FlatFileItemWriterBuilder<PlayerSalaryDto>()
+                .name("playerSalaryDtoFlatFileItemWriter")
+                .resource(new FileSystemResource("player-salary-list.txt")) // 파일을 Write 할 장소 -> player-salary-list.txt
+                .lineAggregator(delimitedLineAggregator) // Write 할 데이터를 어떻게 조합할지 설정
+                .build();
     }
 }
