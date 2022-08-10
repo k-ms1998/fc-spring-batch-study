@@ -71,11 +71,47 @@ public class AdvancedJobConfig {
 
     @Bean
     @JobScope
-    public Step advancedStep(Tasklet advancedTasklet) {
+    public Step advancedStep(StepExecutionListener stepExecutionListener, Tasklet advancedTasklet) {
         return stepBuilderFactory
                 .get("advancedStep")
+                .listener(stepExecutionListener)
                 .tasklet(advancedTasklet)
                 .build();
+    }
+
+    /**
+     * [StepExecutionListener #BeforeStep] StepExecution is : STARTED
+     * [Advanced Job] Job Parameter : targetDate = 2025-01-01
+     * [Advanced Job] Executed Tasklet
+     * [StepExecutionListener #AfterStep] StepExecution is : COMPLETED
+     * @return
+     *
+     * StepListener 를 통해 Step 실행 전 또는 후에 로직을 수행하고 싶을 경우에 사용
+     * */
+    @Bean
+    @StepScope
+    public StepExecutionListener stepExecutionListener() {
+        return new StepExecutionListener() {
+            /**
+             * Step 실행 전의 상태
+             * @param stepExecution
+             */
+            @Override
+            public void beforeStep(StepExecution stepExecution) {
+                log.info("[StepExecutionListener #BeforeStep] StepExecution is : " + stepExecution.getStatus());
+            }
+
+            /**
+             * Step 실행 이후의 상태
+             * @param stepExecution
+             * @return
+             */
+            @Override
+            public ExitStatus afterStep(StepExecution stepExecution) {
+                log.info("[StepExecutionListener #AfterStep] StepExecution is : " + stepExecution.getStatus());
+                return stepExecution.getExitStatus();
+            }
+        };
     }
 
     @Bean
