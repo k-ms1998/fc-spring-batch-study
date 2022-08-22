@@ -1,0 +1,6 @@
+AbduKa00|Karim|Abdul-Jabbar|4800
+AbduRa00|Rabih|Abdullah|4700
+AberWa00|Walter|Abercrombie|6300
+AbraDa00|Danny|Abramowicz|7700
+AdamBo00|Bob|Adams|7600
+AdamCh00|Charlie|Adams|4300
