@@ -1,9 +1,6 @@
 package com.fc.housebatch.core.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "lawd")
 public class Lawd {
 
@@ -39,4 +37,10 @@ public class Lawd {
     @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public Lawd(String lawdCd, String lawdDong, Boolean exist) {
+        this.lawdCd = lawdCd;
+        this.lawdDong = lawdDong;
+        this.exist = exist;
+    }
 }
