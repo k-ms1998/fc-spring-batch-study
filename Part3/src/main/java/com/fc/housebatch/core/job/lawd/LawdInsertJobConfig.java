@@ -2,6 +2,7 @@ package com.fc.housebatch.core.job.lawd;
 
 import com.fc.housebatch.core.entity.Lawd;
 import com.fc.housebatch.core.job.validator.FilePathParameterValidator;
+import com.fc.housebatch.core.service.LawdService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -33,6 +34,8 @@ public class LawdInsertJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
+    private final LawdService lawdService;
+
     @Bean
     public Job lawdInsertJob(Step LawdInsertStep, FilePathParameterValidator filePathParameterValidator) {
         return jobBuilderFactory
@@ -45,7 +48,7 @@ public class LawdInsertJobConfig {
 
     @Bean
     @JobScope
-    public Step lawdInsertStep(FlatFileItemReader<Lawd> flatFileLawdReader, FlatFileItemWriter<Lawd> flatFileLawdWriter) {
+    public Step lawdInsertStep(FlatFileItemReader<Lawd> flatFileLawdReader, ItemWriter<Lawd> lawdItemWriter) {
         /**
          * 법정동(LAWD) 파일을 읽어서 바로 DB로 저장하기 때문에 Reader, Writer 만 필요함(Processor X)
          */
@@ -53,12 +56,7 @@ public class LawdInsertJobConfig {
                 .get("lawdInsertStep")
                 .<Lawd, Lawd>chunk(1000)
                 .reader(flatFileLawdReader)
-                .writer(new ItemWriter<Lawd>() {
-                    @Override
-                    public void write(List<? extends Lawd> items) throws Exception {
-                        items.forEach(System.out::println);
-                    }
-                })
+                .writer(lawdItemWriter)
                 .build();
     }
 
@@ -80,7 +78,11 @@ public class LawdInsertJobConfig {
 
     @Bean
     @StepScope
-    public FlatFileItemWriter<Lawd> flatFileLawdWriter() {
-        return null;
+    public ItemWriter<Lawd> lawdItemWriter() {
+        return items -> {
+            for (Lawd item : items) {
+                lawdService.upsertLawd(item);
+            }
+        };
     }
 }
