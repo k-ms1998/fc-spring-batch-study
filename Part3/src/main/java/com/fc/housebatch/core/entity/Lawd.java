@@ -12,13 +12,14 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "lawd")
 public class Lawd {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "lawd_id")
     private Long id;
 
     @Column(name = "lawd_cd", nullable = false)
@@ -41,6 +42,19 @@ public class Lawd {
     public Lawd(String lawdCd, String lawdDong, Boolean exist) {
         this.lawdCd = lawdCd;
         this.lawdDong = lawdDong;
+        this.exist = exist;
+    }
+
+    public void updateLawdCd(String lawdCd){
+        this.lawdCd = lawdCd;
+    }
+
+
+    public void updateLawdCDong(String lawdDong){
+        this.lawdDong = lawdDong;
+    }
+
+    public void updateExist(boolean exist){
         this.exist = exist;
     }
 }
