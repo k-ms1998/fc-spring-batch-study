@@ -37,12 +37,12 @@ public class LawdInsertJobConfig {
     private final LawdService lawdService;
 
     @Bean
-    public Job lawdInsertJob(Step LawdInsertStep, FilePathParameterValidator filePathParameterValidator) {
+    public Job lawdInsertJob(Step lawdInsertStep, FilePathParameterValidator filePathParameterValidator) {
         return jobBuilderFactory
                 .get("lawdInsertJob")
                 .incrementer(new RunIdIncrementer())
                 .validator(filePathParameterValidator)
-                .start(LawdInsertStep)
+                .start(lawdInsertStep)
                 .build();
     }
 
