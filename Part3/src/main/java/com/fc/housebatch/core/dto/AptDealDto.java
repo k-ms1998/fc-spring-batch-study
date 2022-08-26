@@ -19,43 +19,43 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NoArgsConstructor
 public class AptDealDto {
 
-    @XmlElement(name = "amount") // <item> 태그 안에 <amount> 태그의 값을 매핑
+    @XmlElement(name = "거래금액") // <item> 태그 안에 <amount> 태그의 값을 매핑
     private String dealAmount;
 
-    @XmlElement(name = "builtYear") // <item> 태그 안에 <builtYear> 태그의 값을 매핑
+    @XmlElement(name = "건축년도") // <item> 태그 안에 <builtYear> 태그의 값을 매핑
     private Integer builtYear;
 
-    @XmlElement(name = "year") // <item> 태그 안에 <year> 태그의 값을 매핑
+    @XmlElement(name = "년") // <item> 태그 안에 <year> 태그의 값을 매핑
     private Integer year;
 
-    @XmlElement(name = "dong") // <item> 태그 안에 <year> 태그의 값을 매핑
+    @XmlElement(name = "법정동") // <item> 태그 안에 <year> 태그의 값을 매핑
     private String dong;
 
-    @XmlElement(name = "apt") // <item> 태그 안에 <apt> 태그의 값을 매핑
+    @XmlElement(name = "아파트") // <item> 태그 안에 <apt> 태그의 값을 매핑
     private String aptName;
 
-    @XmlElement(name = "month") // <item> 태그 안에 <month> 태그의 값을 매핑
+    @XmlElement(name = "월") // <item> 태그 안에 <month> 태그의 값을 매핑
     private Integer month;
 
-    @XmlElement(name = "day") // <item> 태그 안에 <day> 태그의 값을 매핑
+    @XmlElement(name = "일") // <item> 태그 안에 <day> 태그의 값을 매핑
     private Integer day;
 
-    @XmlElement(name = "area") // <item> 태그 안에 <area> 태그의 값을 매핑
+    @XmlElement(name = "전용면적") // <item> 태그 안에 <area> 태그의 값을 매핑
     private Double area;
 
-    @XmlElement(name = "jibun") // <item> 태그 안에 <jibun> 태그의 값을 매핑
+    @XmlElement(name = "지번") // <item> 태그 안에 <jibun> 태그의 값을 매핑
     private String jibun;
 
-    @XmlElement(name = "areaCode") // <item> 태그 안에 <areaCode> 태그의 값을 매핑
+    @XmlElement(name = "지역코드") // <item> 태그 안에 <areaCode> 태그의 값을 매핑
     private String regionCode;
 
-    @XmlElement(name = "floor") // <item> 태그 안에 <floor> 태그의 값을 매핑
+    @XmlElement(name = "층") // <item> 태그 안에 <floor> 태그의 값을 매핑
     private Integer floor;
 
-    @XmlElement(name = "dealCanceledDate") // <item> 태그 안에 <dealCanceledDate> 태그의 값을 매핑
+    @XmlElement(name = "해제사유발생일") // <item> 태그 안에 <dealCanceledDate> 태그의 값을 매핑
     private String dealCanceledDate;
 
-    @XmlElement(name = "dealCanceled") // <item> 태그 안에 <dealCanceled> 태그의 값을 매핑
+    @XmlElement(name = "해제여부") // <item> 태그 안에 <dealCanceled> 태그의 값을 매핑
     private String dealCanceled;
 
 }
