@@ -22,6 +22,10 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
+external:
+  apartment-api:
+    path: http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTrade
+    service-key: zvVIVlJi3HeUp3yP3PI6pzTnFdb5Q4QHKXqC2Hb9xPkqHOTSkmM41cPIb7CwOJCsIyV6vZ1TXFEQufsjJ%2BXfYg%3D%3D
 ---
 spring:
   config:
