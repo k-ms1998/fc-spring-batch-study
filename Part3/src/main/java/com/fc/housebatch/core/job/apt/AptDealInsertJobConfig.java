@@ -1,6 +1,7 @@
 package com.fc.housebatch.core.job.apt;
 
 import ch.qos.logback.core.joran.event.stax.StaxEvent;
+import com.fc.housebatch.adapter.ApartmentApiResource;
 import com.fc.housebatch.core.dto.AptDealDto;
 import com.fc.housebatch.core.job.validator.FilePathParameterValidator;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
+import java.time.YearMonth;
 import java.util.List;
 
 @Slf4j
@@ -31,11 +33,12 @@ public class AptDealInsertJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
+    private final ApartmentApiResource apartmentApiResource;
+
     @Bean
-    public Job aptDealInsertJob(Step aptDealInsertStep, FilePathParameterValidator filePathParameterValidator) {
+    public Job aptDealInsertJob(Step aptDealInsertStep) {
         return jobBuilderFactory
                 .get("aptDealInsertJob")
-                .validator(filePathParameterValidator)
                 .incrementer(new RunIdIncrementer())
                 .start(aptDealInsertStep)
                 .build();
@@ -52,6 +55,7 @@ public class AptDealInsertJobConfig {
                     @Override
                     public void write(List<? extends AptDealDto> items) throws Exception {
                         items.forEach(i -> System.out.println(i));
+                        System.out.println("===== Chunk Completed =====");
                     }
                 })
                 .build();
@@ -59,11 +63,10 @@ public class AptDealInsertJobConfig {
 
     @Bean
     @StepScope
-    public StaxEventItemReader<AptDealDto> aptDealResourceReader(@Value("#{jobParameters['filePath']}") String filePath,
-                                                                 Jaxb2Marshaller aptDealDtoMarshaller) {
+    public StaxEventItemReader<AptDealDto> aptDealResourceReader(Jaxb2Marshaller aptDealDtoMarshaller) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
                 .name("aptDealResourceReader")
-                .resource(new ClassPathResource(filePath))
+                .resource(apartmentApiResource.getResource("41135", YearMonth.of(2021, 7)))
                 .addFragmentRootElements("item") // 읽을 Element 설정; xml 파일에서 <item> 태그 읽기
                 .unmarshaller(aptDealDtoMarshaller) // 파일(apartment-api-response.xml)을 객체(AptDealDto)에 매핑하기
                 .build();
@@ -72,12 +75,12 @@ public class AptDealInsertJobConfig {
     @Bean
     @StepScope
     public Jaxb2Marshaller aptDealDtoMarshaller() {
+
         Jaxb2Marshaller jaxb2Marshaller = new Jaxb2Marshaller();
         /**
          * AptDealDto 로 매핑하기
          */
         jaxb2Marshaller.setClassesToBeBound(AptDealDto.class);
-
         return jaxb2Marshaller;
     }
 
