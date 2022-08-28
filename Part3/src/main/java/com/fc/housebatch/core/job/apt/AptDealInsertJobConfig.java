@@ -63,10 +63,12 @@ public class AptDealInsertJobConfig {
 
     @Bean
     @StepScope
-    public StaxEventItemReader<AptDealDto> aptDealResourceReader(Jaxb2Marshaller aptDealDtoMarshaller) {
+    public StaxEventItemReader<AptDealDto> aptDealResourceReader(Jaxb2Marshaller aptDealDtoMarshaller,
+                                                                 @Value("#{jobParameters['yearMonth']}") String yearMonthStr,
+                                                                 @Value("#{jobParameters['lawdCd']}") String lawdCd) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
                 .name("aptDealResourceReader")
-                .resource(apartmentApiResource.getResource("41135", YearMonth.of(2021, 7)))
+                .resource(apartmentApiResource.getResource(lawdCd, YearMonth.parse(yearMonthStr)))
                 .addFragmentRootElements("item") // 읽을 Element 설정; xml 파일에서 <item> 태그 읽기
                 .unmarshaller(aptDealDtoMarshaller) // 파일(apartment-api-response.xml)을 객체(AptDealDto)에 매핑하기
                 .build();
