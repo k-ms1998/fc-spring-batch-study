@@ -4,14 +4,18 @@ import ch.qos.logback.core.joran.event.stax.StaxEvent;
 import com.fc.housebatch.adapter.ApartmentApiResource;
 import com.fc.housebatch.core.dto.AptDealDto;
 import com.fc.housebatch.core.job.validator.FilePathParameterValidator;
+import com.fc.housebatch.core.job.validator.LawdCdParameterValidator;
+import com.fc.housebatch.core.job.validator.YearMonthParameterValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.CompositeJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.xml.StaxEventItemReader;
@@ -23,6 +27,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import java.time.YearMonth;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -36,12 +41,33 @@ public class AptDealInsertJobConfig {
     private final ApartmentApiResource apartmentApiResource;
 
     @Bean
-    public Job aptDealInsertJob(Step aptDealInsertStep) {
+    public Job aptDealInsertJob(Step aptDealInsertStep, JobParametersValidator aptDealJobParameterValidator) {
         return jobBuilderFactory
                 .get("aptDealInsertJob")
                 .incrementer(new RunIdIncrementer())
+                .validator(aptDealJobParameterValidator)
                 .start(aptDealInsertStep)
                 .build();
+    }
+
+    /**
+     * CompositeJobParametersValidator 에서 setValidators 한 validator 들을 순회
+     * 순회하면서 각 validator 의 validate 호출
+     * validate 이 호출되면서 JobParameter 확인
+     * 이때, setValidators 를 리스트로 넘겨줌
+     *  -> 리스트의 순서대로 validate 을 호출해서 확인함
+     *      -> 앞 순서에서 에러 발생하면, 뒤에 있는 validator 들은 확인 X
+     *          -> A, B, C 순서로 validator 들이 있을때, A에서 에러가 발생하면 B, C 는 확인 X
+     */
+    @Bean
+    protected JobParametersValidator aptDealJobParameterValidator() {
+        CompositeJobParametersValidator validator = new CompositeJobParametersValidator();
+        validator.setValidators(Arrays.asList(
+                new LawdCdParameterValidator(),
+                new YearMonthParameterValidator()
+        ));
+
+        return validator;
     }
 
     @Bean
