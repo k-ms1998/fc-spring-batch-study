@@ -6,20 +6,25 @@ import com.fc.housebatch.core.dto.AptDealDto;
 import com.fc.housebatch.core.job.validator.FilePathParameterValidator;
 import com.fc.housebatch.core.job.validator.LawdCdParameterValidator;
 import com.fc.housebatch.core.job.validator.YearMonthParameterValidator;
+import com.fc.housebatch.core.repository.LawdRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.CompositeJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,14 +44,16 @@ public class AptDealInsertJobConfig {
     private final StepBuilderFactory stepBuilderFactory;
 
     private final ApartmentApiResource apartmentApiResource;
+    private final LawdRepository lawdRepository;
 
     @Bean
-    public Job aptDealInsertJob(Step aptDealInsertStep, JobParametersValidator aptDealJobParameterValidator) {
+    public Job aptDealInsertJob(Step aptDealInsertStep, Step getGuLawdCdStep,
+                                JobParametersValidator aptDealJobParameterValidator) {
         return jobBuilderFactory
                 .get("aptDealInsertJob")
                 .incrementer(new RunIdIncrementer())
                 .validator(aptDealJobParameterValidator)
-                .start(aptDealInsertStep)
+                .start(getGuLawdCdStep)
                 .build();
     }
 
@@ -85,6 +92,26 @@ public class AptDealInsertJobConfig {
                     }
                 })
                 .build();
+    }
+
+    @Bean
+    @JobScope
+    public Step getGuLawdCdStep(Tasklet guLawdCdTasklet) {
+        return stepBuilderFactory
+                .get("getGuLawdCdStep")
+                .tasklet(guLawdCdTasklet)
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public Tasklet guLawdCdTasklet() {
+        return (contribution, chunkContext) -> {
+            List<String> allDistinctGuLawdCd = lawdRepository.findAllDistinctGuLawdCd();
+            allDistinctGuLawdCd.forEach(System.out::println);
+
+            return RepeatStatus.FINISHED;
+        };
     }
 
     @Bean
