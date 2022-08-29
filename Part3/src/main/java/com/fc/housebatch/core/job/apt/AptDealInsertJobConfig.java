@@ -9,10 +9,7 @@ import com.fc.housebatch.core.job.validator.YearMonthParameterValidator;
 import com.fc.housebatch.core.repository.LawdRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParametersValidator;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -21,6 +18,7 @@ import org.springframework.batch.core.job.CompositeJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
@@ -47,13 +45,14 @@ public class AptDealInsertJobConfig {
     private final LawdRepository lawdRepository;
 
     @Bean
-    public Job aptDealInsertJob(Step aptDealInsertStep, Step getGuLawdCdStep,
+    public Job aptDealInsertJob(Step aptDealInsertStep, Step getGuLawdCdStep, Step executionContextPrintStep,
                                 JobParametersValidator aptDealJobParameterValidator) {
         return jobBuilderFactory
                 .get("aptDealInsertJob")
                 .incrementer(new RunIdIncrementer())
                 .validator(aptDealJobParameterValidator)
                 .start(getGuLawdCdStep)
+                .next(executionContextPrintStep)
                 .build();
     }
 
@@ -104,11 +103,46 @@ public class AptDealInsertJobConfig {
     }
 
     @Bean
+    @JobScope
+    public Step executionContextPrintStep(){
+        /**
+         * getGuLawdCdStep -> guLawdCdTasklet (ExecutionContext 에 데이터 저장)
+         *                      -> executionContextPrintStep -> tasklet 에서 ExecutionContext 에서 앞서 저장한 데이터를 가져와서 출력
+         */
+        return stepBuilderFactory
+                .get("executionContextPrintStep")
+                .tasklet((contribution, chunkContext) -> {
+                    /**
+                     * ExecutionContext 에 저장된 값을 가져와서 출력하기
+                     */
+                    ExecutionContext executionContext = chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
+                    String guLawdCd = executionContext.getString("guLawdCd");
+                    System.out.println("[executionContextPrintStep Tasklet] guLawdCd = " + guLawdCd);
+
+                    return RepeatStatus.FINISHED;
+                })
+                .build();
+    }
+
+    @Bean
     @StepScope
     public Tasklet guLawdCdTasklet() {
         return (contribution, chunkContext) -> {
+            /**
+             * ExecutionContext 를 가져오기 위해 먼저 현재 Step 의 StepExecution  가져오기
+             */
+            StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+            /**
+             * 현재 Job 에서의 ExecutionContext 를 가져오기
+             * -> ExecutionContext 를 통해서 Step 끼리 데이터를 주고 받음
+             */
+            ExecutionContext jobExecutionContext = stepExecution.getJobExecution().getExecutionContext();
+
             List<String> allDistinctGuLawdCd = lawdRepository.findAllDistinctGuLawdCd();
-            allDistinctGuLawdCd.forEach(System.out::println);
+            /**
+             * ExecutionContext 는 Key-Value 로 값을 저장함
+             */
+            jobExecutionContext.putString("guLawdCd", allDistinctGuLawdCd.get(0));
 
             return RepeatStatus.FINISHED;
         };
