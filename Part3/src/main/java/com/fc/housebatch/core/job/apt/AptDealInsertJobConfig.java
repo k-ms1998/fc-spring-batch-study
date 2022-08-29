@@ -53,6 +53,7 @@ public class AptDealInsertJobConfig {
                 .validator(aptDealJobParameterValidator)
                 .start(getGuLawdCdStep)
                 .next(executionContextPrintStep)
+                .next(aptDealInsertStep)
                 .build();
     }
 
@@ -69,6 +70,10 @@ public class AptDealInsertJobConfig {
     protected JobParametersValidator aptDealJobParameterValidator() {
         CompositeJobParametersValidator validator = new CompositeJobParametersValidator();
         validator.setValidators(Arrays.asList(
+                /**
+                 * getGuLawdCdStep 로 jobExecutionContext 로 lawdCd/guLawdCd 를 가져오는 경우에는 LawdCdParameterValidator 필요 X
+                 * LawdCdParameterValidator 는 jobParameter 로 lawdCd 를 가져올때 validate 하는 것이 목적
+                 */
                 new LawdCdParameterValidator(),
                 new YearMonthParameterValidator()
         ));
@@ -152,10 +157,10 @@ public class AptDealInsertJobConfig {
     @StepScope
     public StaxEventItemReader<AptDealDto> aptDealResourceReader(Jaxb2Marshaller aptDealDtoMarshaller,
                                                                  @Value("#{jobParameters['yearMonth']}") String yearMonthStr,
-                                                                 @Value("#{jobParameters['lawdCd']}") String lawdCd) {
+                                                                 @Value("#{jobExecutionContext['guLawdCd']}") String guLawdCd) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
                 .name("aptDealResourceReader")
-                .resource(apartmentApiResource.getResource(lawdCd, YearMonth.parse(yearMonthStr)))
+                .resource(apartmentApiResource.getResource(guLawdCd, YearMonth.parse(yearMonthStr)))
                 .addFragmentRootElements("item") // 읽을 Element 설정; xml 파일에서 <item> 태그 읽기
                 .unmarshaller(aptDealDtoMarshaller) // 파일(apartment-api-response.xml)을 객체(AptDealDto)에 매핑하기
                 .build();
