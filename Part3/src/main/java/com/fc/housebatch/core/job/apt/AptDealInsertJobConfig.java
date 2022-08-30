@@ -52,8 +52,15 @@ public class AptDealInsertJobConfig {
                 .incrementer(new RunIdIncrementer())
                 .validator(aptDealJobParameterValidator)
                 .start(getGuLawdCdStep)
-                .next(executionContextPrintStep)
-                .next(aptDealInsertStep)
+                    /**
+                     * getGuLawdCdStep 실행했을때 성공(아직 처리하지 않은 데이터가 있을때)
+                     * -> CONTINUABLE(on) -> executionContextPrintStep 실행(to) -> 다시 getGuLawdCdStep 로 가서 다음 데이터 가져오기(next)
+                     */
+                    .on("CONTINUABLE").to(executionContextPrintStep).next(getGuLawdCdStep)
+                    .from(getGuLawdCdStep).on("*").end() // getGuLawdCdStep 실행했을때 실패(모든 데이터를 가져와서 처리했을때) -> 종료
+                    .end()// FlowJobBuilder end
+//                .next(executionContextPrintStep)
+//                .next(aptDealInsertStep)
                 .build();
     }
 
@@ -129,6 +136,13 @@ public class AptDealInsertJobConfig {
                 .build();
     }
 
+    /**
+     * ExecutionContext 에 저장할 데이터
+     * 1. guLawdCd -> 구 코드 -> 다음 Step 에서 활용할 값
+     * 2. guLawdCdList -> 구 코드 리스트
+     * 3. itemCount -> 남아있는 구 코드의 갯수
+     * @return
+     */
     @Bean
     @StepScope
     public Tasklet guLawdCdTasklet() {
@@ -137,17 +151,47 @@ public class AptDealInsertJobConfig {
              * ExecutionContext 를 가져오기 위해 먼저 현재 Step 의 StepExecution  가져오기
              */
             StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+
             /**
              * 현재 Job 에서의 ExecutionContext 를 가져오기
              * -> ExecutionContext 를 통해서 Step 끼리 데이터를 주고 받음
              */
             ExecutionContext jobExecutionContext = stepExecution.getJobExecution().getExecutionContext();
 
-            List<String> allDistinctGuLawdCd = lawdRepository.findAllDistinctGuLawdCd();
+            List<String> guLawdCdList;
+            if (!jobExecutionContext.containsKey("guLawdCdList")) {
+                /**
+                 * Step 을 처음 실행하면 ExecutionContext 에 값들이 없기 때문에 값들을 저장 시켜주기
+                 */
+                guLawdCdList = lawdRepository.findAllDistinctGuLawdCd();
+                jobExecutionContext.put("guLawdCdList", guLawdCdList);
+                jobExecutionContext.putInt("itemCount", guLawdCdList.size());
+            } else {
+                guLawdCdList = (List<String>) jobExecutionContext.get("guLawdCdList");
+            }
+            Integer itemCount = jobExecutionContext.getInt("itemCount");
+
+            /**
+             * 더이상 읽을 데이터가 없을때
+             */
+            if (itemCount == 0) {
+                contribution.setExitStatus(ExitStatus.COMPLETED);
+                return RepeatStatus.FINISHED;
+            }
+
+            itemCount--;
             /**
              * ExecutionContext 는 Key-Value 로 값을 저장함
              */
-            jobExecutionContext.putString("guLawdCd", allDistinctGuLawdCd.get(0));
+            String guLawdCd = guLawdCdList.get(itemCount);
+            jobExecutionContext.putString("guLawdCd", guLawdCd);
+            jobExecutionContext.putInt("itemCount", itemCount);
+
+            /**
+             * 데이터가 있으면 다음 Step 실행. 없으면 종료.
+             * 데이터가 있으면 -> CONTINUABLE
+             */
+            contribution.setExitStatus(new ExitStatus("CONTINUABLE"));
 
             return RepeatStatus.FINISHED;
         };
