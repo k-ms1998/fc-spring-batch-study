@@ -1,5 +1,6 @@
 package com.fc.housebatch.core.dto;
 
+import io.micrometer.core.instrument.util.StringUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,55 +8,86 @@ import lombok.ToString;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
- * ¾ÆÆÄÆ® ½Ç°Å·¡°¡ÀÇ °Å·¡ Á¤º¸¸¦ ´ã´Â °´Ã¼ (apartment-api-response.xml Âü°í)
+ * ì•„íŒŒíŠ¸ ì‹¤ê±°ë˜ê°€ì˜ ê±°ë˜ ì •ë³´ë¥¼ ë‹´ëŠ” ê°ì²´ (apartment-api-response.xml ì°¸ê³ )
  *
- * @Setter Ãß°¡½Ã ¿À·ù ¹ß»ı => @XmlElement ·Î XML À» °´Ã¼ ¸ÅÇÎÇÒ¶§ @Setter ¿Í Ãæµ¹ ¹ß»ı
+ * @Setter ì¶”ê°€ì‹œ ì˜¤ë¥˜ ë°œìƒ => @XmlElement ë¡œ XML ì„ ê°ì²´ ë§¤í•‘í• ë•Œ @Setter ì™€ ì¶©ëŒ ë°œìƒ
  */
 @ToString
 @Getter
-@XmlRootElement(name = "item") // XML ÆÄÀÏÀÇ <item> ÅÂ±× È®ÀÎ
+@XmlRootElement(name = "item") // XML íŒŒì¼ì˜ <item> íƒœê·¸ í™•ì¸
 @NoArgsConstructor
 public class AptDealDto {
 
-    @XmlElement(name = "°Å·¡±İ¾×") // <item> ÅÂ±× ¾È¿¡ <amount> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ê±°ë˜ê¸ˆì•¡") // <item> íƒœê·¸ ì•ˆì— <ê±°ë˜ê¸ˆì•¡> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private String dealAmount;
 
-    @XmlElement(name = "°ÇÃà³âµµ") // <item> ÅÂ±× ¾È¿¡ <builtYear> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ê±´ì¶•ë…„ë„") // <item> íƒœê·¸ ì•ˆì— <ê±´ì¶•ë…„ë„> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private Integer builtYear;
 
-    @XmlElement(name = "³â") // <item> ÅÂ±× ¾È¿¡ <year> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ë…„") // <item> íƒœê·¸ ì•ˆì— <ë…„> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private Integer year;
 
-    @XmlElement(name = "¹ıÁ¤µ¿") // <item> ÅÂ±× ¾È¿¡ <year> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ë²•ì •ë™") // <item> íƒœê·¸ ì•ˆì— <ë²•ì •ë™> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private String dong;
 
-    @XmlElement(name = "¾ÆÆÄÆ®") // <item> ÅÂ±× ¾È¿¡ <apt> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ì•„íŒŒíŠ¸") // <item> íƒœê·¸ ì•ˆì— <ì•„íŒŒíŠ¸> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private String aptName;
 
-    @XmlElement(name = "¿ù") // <item> ÅÂ±× ¾È¿¡ <month> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ì›”") // <item> íƒœê·¸ ì•ˆì— <ì›”> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private Integer month;
 
-    @XmlElement(name = "ÀÏ") // <item> ÅÂ±× ¾È¿¡ <day> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ì¼") // <item> íƒœê·¸ ì•ˆì— <ì¼> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private Integer day;
 
-    @XmlElement(name = "Àü¿ë¸éÀû") // <item> ÅÂ±× ¾È¿¡ <area> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ì „ìš©ë©´ì ") // <item> íƒœê·¸ ì•ˆì— <ì „ìš©ë©´ì > íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private Double area;
 
-    @XmlElement(name = "Áö¹ø") // <item> ÅÂ±× ¾È¿¡ <jibun> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ì§€ë²ˆ") // <item> íƒœê·¸ ì•ˆì— <ì§€ë²ˆ> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private String jibun;
 
-    @XmlElement(name = "Áö¿ªÄÚµå") // <item> ÅÂ±× ¾È¿¡ <areaCode> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ì§€ì—­ì½”ë“œ") // <item> íƒœê·¸ ì•ˆì— <ì§€ì—­ì½”ë“œ> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private String regionCode;
 
-    @XmlElement(name = "Ãş") // <item> ÅÂ±× ¾È¿¡ <floor> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
+    @XmlElement(name = "ì¸µ") // <item> íƒœê·¸ ì•ˆì— <ì¸µ> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
     private Integer floor;
 
-    @XmlElement(name = "ÇØÁ¦»çÀ¯¹ß»ıÀÏ") // <item> ÅÂ±× ¾È¿¡ <dealCanceledDate> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
-    private String dealCanceledDate;
+    @XmlElement(name = "í•´ì œì‚¬ìœ ë°œìƒì¼") // <item> íƒœê·¸ ì•ˆì— <í•´ì œì‚¬ìœ ë°œìƒì¼> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
+    private String dealCanceledDate; // O
 
-    @XmlElement(name = "ÇØÁ¦¿©ºÎ") // <item> ÅÂ±× ¾È¿¡ <dealCanceled> ÅÂ±×ÀÇ °ªÀ» ¸ÅÇÎ
-    private String dealCanceled;
+    @XmlElement(name = "í•´ì œì—¬ë¶€") // <item> íƒœê·¸ ì•ˆì— <í•´ì œì—¬ë¶€> íƒœê·¸ì˜ ê°’ì„ ë§¤í•‘
+    private String dealCanceled; // yy.MM.dd
 
+    public LocalDate dealDateFromAptDealDto() {
+        Integer dealYear = this.getYear();
+        Integer dealMonth = this.getMonth();
+        Integer dealDay = this.getDay();
+
+        return LocalDate.of(dealYear, dealMonth, dealDay);
+    }
+
+    public Long dealAmountFromAptDealDto() {
+        /**
+         * dealAmount ì˜ ',' ë¥¼ ê³µë°±ìœ¼ë¡œ ì¹˜í™˜
+         */
+        String amount = this.dealAmount.replaceAll(",", "").trim();
+        
+        return Long.parseLong(amount);
+    }
+
+    public Boolean dealCanceledFromAptDealDto(){
+        return (this.dealCanceled.equals("O"));
+    }
+
+    public LocalDate dealCanceledDateFromAptDealDto(){
+        if (StringUtils.isBlank(this.dealCanceledDate)) {
+            return null;
+        }
+
+        return LocalDate.parse(this.dealCanceledDate.trim(),
+                DateTimeFormatter.ofPattern("yy.MM.dd"));
+    }
 }
