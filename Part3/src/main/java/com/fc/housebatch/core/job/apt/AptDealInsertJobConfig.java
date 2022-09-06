@@ -7,6 +7,8 @@ import com.fc.housebatch.core.job.validator.FilePathParameterValidator;
 import com.fc.housebatch.core.job.validator.LawdCdParameterValidator;
 import com.fc.housebatch.core.job.validator.YearMonthParameterValidator;
 import com.fc.housebatch.core.repository.LawdRepository;
+import com.fc.housebatch.core.service.AptDealService;
+import com.fc.housebatch.core.service.AptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
@@ -55,7 +57,7 @@ public class AptDealInsertJobConfig {
                      * getGuLawdCdStep 실행했을때 성공(아직 처리하지 않은 데이터가 있을때)
                      * -> CONTINUABLE(on) -> executionContextPrintStep 실행(to) -> 다시 getGuLawdCdStep 로 가서 다음 데이터 가져오기(next)
                      */
-                    .on("CONTINUABLE").to(executionContextPrintStep).next(getGuLawdCdStep)
+                    .on("CONTINUABLE").to(aptDealInsertStep).next(getGuLawdCdStep)
                     .from(getGuLawdCdStep).on("*").end() // getGuLawdCdStep 실행했을때 실패(모든 데이터를 가져와서 처리했을때) -> 종료
                     .end()// FlowJobBuilder end
 //                .next(aptDealInsertStep)
@@ -88,18 +90,12 @@ public class AptDealInsertJobConfig {
 
     @Bean
     @JobScope
-    public Step aptDealInsertStep(StaxEventItemReader<AptDealDto> aptDealResourceReader) {
+    public Step aptDealInsertStep(StaxEventItemReader<AptDealDto> aptDealResourceReader, ItemWriter<AptDealDto> aptDealDtoItemWriter) {
         return stepBuilderFactory
                 .get("aptDealInsertStep")
                 .<AptDealDto, AptDealDto>chunk(10)
                 .reader(aptDealResourceReader)
-                .writer(new ItemWriter<AptDealDto>() {
-                    @Override
-                    public void write(List<? extends AptDealDto> items) throws Exception {
-                        items.forEach(i -> System.out.println(i));
-                        System.out.println("===== Chunk Completed =====");
-                    }
-                })
+                .writer(aptDealDtoItemWriter)
                 .build();
     }
 
@@ -148,7 +144,8 @@ public class AptDealInsertJobConfig {
                                                                  @Value("#{jobExecutionContext['guLawdCd']}") String guLawdCd) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
                 .name("aptDealResourceReader")
-                .resource(apartmentApiResource.getResource(guLawdCd, YearMonth.parse(yearMonthStr)))
+//                .resource(apartmentApiResource.getResource(guLawdCd, YearMonth.parse(yearMonthStr)))
+                .resource(new ClassPathResource("apartment-api-response.xml"))
                 .addFragmentRootElements("item") // 읽을 Element 설정; xml 파일에서 <item> 태그 읽기
                 .unmarshaller(aptDealDtoMarshaller) // 파일(apartment-api-response.xml)을 객체(AptDealDto)에 매핑하기
                 .build();
@@ -164,6 +161,14 @@ public class AptDealInsertJobConfig {
          */
         jaxb2Marshaller.setClassesToBeBound(AptDealDto.class);
         return jaxb2Marshaller;
+    }
+
+    @Bean
+    @StepScope
+    public ItemWriter<AptDealDto> aptDealDtoItemWriter(AptDealService aptDealService) {
+        return items -> {
+          items.forEach(aptDealService::upsert);
+        };
     }
 
 }
