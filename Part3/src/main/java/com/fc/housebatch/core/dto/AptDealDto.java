@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 /**
  * 아파트 실거래가의 거래 정보를 담는 객체 (apartment-api-response.xml 참고)
@@ -17,7 +18,6 @@ import java.time.format.DateTimeFormatter;
  * @Setter 추가시 오류 발생 => @XmlElement 로 XML 을 객체 매핑할때 @Setter 와 충돌 발생
  */
 @ToString
-@Getter
 @XmlRootElement(name = "item") // XML 파일의 <item> 태그 확인
 @NoArgsConstructor
 public class AptDealDto {
@@ -60,6 +60,58 @@ public class AptDealDto {
 
     @XmlElement(name = "DealCanceled") // <item> 태그 안에 <DealCanceled> 태그의 값을 매핑
     private String dealCanceled; // yy.MM.dd
+
+    public String getDealAmount() {
+        return dealAmount;
+    }
+
+    public Integer getBuiltYear() {
+        return Optional.ofNullable(this.builtYear).orElse(0);
+    }
+
+    public Integer getYear() {
+        return Optional.ofNullable(this.year).orElse(0);
+    }
+
+    public String getDong() {
+        return Optional.ofNullable(this.dong).orElse("");
+    }
+
+    public String getAptName() {
+        return Optional.ofNullable(this.aptName).orElse("");
+    }
+
+    public Integer getMonth() {
+        return Optional.ofNullable(this.month).orElse(0);
+    }
+
+    public Integer getDay() {
+        return Optional.ofNullable(this.day).orElse(0);
+    }
+
+    public Double getArea() {
+        return Optional.ofNullable(this.area).orElse(0.0);
+    }
+
+    public String getJibun() {
+        return Optional.ofNullable(this.jibun).orElse("");
+    }
+
+    public String getRegionCode() {
+        return Optional.ofNullable(this.regionCode).orElse("");
+    }
+
+    public Integer getFloor() {
+        return Optional.ofNullable(this.floor).orElse(0);
+    }
+
+    public String getDealCanceledDate() {
+        return Optional.ofNullable(this.dealCanceledDate).orElse("");
+    }
+
+    public String getDealCanceled() {
+        return Optional.ofNullable(this.dealCanceled).orElse("");
+    }
 
     public LocalDate dealDateFromAptDealDto() {
         Integer dealYear = this.getYear();
