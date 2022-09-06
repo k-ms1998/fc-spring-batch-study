@@ -57,7 +57,8 @@ public class AptDeal {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public AptDeal(Double exclusiveArea, LocalDate dealDate, Long dealAmount, Integer floor, Boolean dealCanceled, LocalDate dealCanceledDate) {
+    public AptDeal(Apt apt, Double exclusiveArea, LocalDate dealDate, Long dealAmount, Integer floor, Boolean dealCanceled, LocalDate dealCanceledDate) {
+        this.apt = apt;
         this.exclusiveArea = exclusiveArea;
         this.dealDate = dealDate;
         this.dealAmount = dealAmount;
@@ -66,7 +67,12 @@ public class AptDeal {
         this.dealCanceledDate = dealCanceledDate;
     }
 
-    public AptDeal from(AptDealDto aptDealDto) {
+    public void updateDealCanceledAndDate(boolean dealCanceled, LocalDate dealCanceledDate) {
+        this.dealCanceled = dealCanceled;
+        this.dealCanceledDate = dealCanceledDate;
+    }
+
+    public static AptDeal of(Apt apt, AptDealDto aptDealDto) {
         Double exclusiveArea = aptDealDto.getArea();
         LocalDate dealDate = aptDealDto.dealDateFromAptDealDto();
         Long dealAmount = aptDealDto.dealAmountFromAptDealDto();
@@ -74,7 +80,7 @@ public class AptDeal {
         Boolean dealCanceled = aptDealDto.dealCanceledFromAptDealDto();
         LocalDate dealCanceledDate = aptDealDto.dealCanceledDateFromAptDealDto();
 
-        return new AptDeal(exclusiveArea, dealDate, dealAmount, floor, dealCanceled, dealCanceledDate);
+        return new AptDeal(apt, exclusiveArea, dealDate, dealAmount, floor, dealCanceled, dealCanceledDate);
     }
 
 
