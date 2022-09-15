@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<response>
+    <header>
+        <resultCode>00</resultCode>
+        <resultMsg>NORMAL SERVICE.</resultMsg>
+    </header>
+    <body>
+        <items>
+            <item>
+                <DealAmount> 167,000</DealAmount>
+                <DealType> </DealType>
+                <BuiltYear>2008</BuiltYear>
+                <Year>2021</Year>
+                <Dong> 사직동</Dong>
+                <AptName>광화문스페이스본(106동)</AptName>
+                <Month>7</Month>
+                <Day>15</Day>
+                <ExclusiveArea>144.52</ExclusiveArea>
+                <DealArea> </DealArea>
+                <Jibun>9-1</Jibun>
+                <AreaCode>11110</AreaCode>
+                <Floor>7</Floor>
+                <DealCanceledDate> </DealCanceledDate>
+                <DealCanceled> </DealCanceled>
+            </item>
+            <item>
+                <DealAmount> 180,000</DealAmount>
+                <DealType> </DealType>
+                <BuiltYear>2008</BuiltYear>
+                <Year>2021</Year>
+                <Dong> 사직동</Dong>
+                <AptName>광화문스페이스본(101동~105동)</AptName>
+                <Month>7</Month>
+                <Day>19</Day>
+                <ExclusiveArea>147.31</ExclusiveArea>
+                <DealArea> </DealArea>
+                <Jibun>9</Jibun>
+                <AreaCode>11110</AreaCode>
+                <Floor>7</Floor>
+                <DealCanceledDate> </DealCanceledDate>
+                <DealCanceled> </DealCanceled>
+            </item>
+            <item>
+                <DealAmount> 164,500</DealAmount>
+                <DealType> </DealType>
+                <BuiltYear>2008</BuiltYear>
+                <Year>2021</Year>
+                <Dong> 사직동</Dong>
+                <AptName>광화문스페이스본(101동~105동)</AptName>
+                <Month>7</Month>
+                <Day>22</Day>
+                <ExclusiveArea>159.01</ExclusiveArea>
+                <DealArea> </DealArea>
+                <Jibun>9</Jibun>
+                <AreaCode>11110</AreaCode>
+                <Floor>9</Floor>
+                <DealCanceledDate> </DealCanceledDate>
+                <DealCanceled> </DealCanceled>
+            </item>
+        </items>
+        <numOfRows>10</numOfRows>
+        <pageNo>1</pageNo>
+        <totalCount>1</totalCount>
+    </body>
+</response>
