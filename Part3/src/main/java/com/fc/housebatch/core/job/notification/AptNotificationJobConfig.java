@@ -40,11 +40,11 @@ public class AptNotificationJobConfig {
     private final StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Job aptNotificationJob(Step aptNotificationStep, DealDateParameterValidator dealDateParameterValidator) {
+    public Job aptNotificationJob(Step aptNotificationStep) {
         return jobBuilderFactory
                 .get("aptNotificationJob")
                 .incrementer(new RunIdIncrementer())
-                .validator(dealDateParameterValidator)
+                .validator(new DealDateParameterValidator())
                 .start(aptNotificationStep)
                 .build();
     }
