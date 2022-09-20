@@ -64,10 +64,14 @@ public class AptNotificationJobConfigTest {
     @Test
     void given_when_thenSuccess() throws Exception {
         // Given
+        String email1 = "email1@email.com";
+        String email2 = "email2@email.com";
+        String guLawdCd = "11110";
         LocalDate dealDate = LocalDate.now().minusDays(1);
-        givenAptNotification();
-        givenLawdCd();
-        givenAptDeal();
+
+        givenAptNotification(new String[]{email1, email2}, guLawdCd);
+        givenLawdCd(guLawdCd);
+        givenAptDeal(guLawdCd, dealDate);
 
         // When
         JobExecution execution = jobLauncherTestUtils.launchJob(
@@ -75,25 +79,30 @@ public class AptNotificationJobConfigTest {
 
         // Then
         Assertions.assertEquals(execution.getExitStatus(), ExitStatus.COMPLETED);
-        Mockito.verify(fakeSendService, Mockito.times(1)).send(Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(fakeSendService, Mockito.times(1)).send(Mockito.eq(email1), Mockito.anyString());
+        Mockito.verify(fakeSendService, Mockito.never()).send(Mockito.eq(email2), Mockito.anyString());
 
     }
 
-    private void givenAptNotification() {
-        AptNotification aptNotification =
-                new AptNotification("email1@email.com", "11110", true,
+    private void givenAptNotification(String[] emails, String guLawdCd) {
+        aptNotificationRepository.save(createAptNotification(emails[0], guLawdCd, true));
+        aptNotificationRepository.save(createAptNotification(emails[1], guLawdCd, false));
+    }
+
+    private AptNotification createAptNotification(String email, String guLawdCd, boolean enabled) {
+        return new AptNotification(email, guLawdCd, enabled,
                         LocalDateTime.now(), LocalDateTime.now());
 
-        aptNotificationRepository.save(aptNotification);
     }
 
-    private void givenLawdCd() {
-        Mockito.when(lawdRepository.findByLawdCd("1111000000"))
-                .thenReturn(Optional.of(new Lawd("1111000000", "경기도 성남시 분당구", true)));
+    private void givenLawdCd(String guLawdCd) {
+        String lawdCd = guLawdCd + "00000";
+        Mockito.when(lawdRepository.findByLawdCd(lawdCd))
+                .thenReturn(Optional.of(new Lawd(lawdCd, "경기도 성남시 분당구", true)));
     }
 
-    private void givenAptDeal() {
-        Mockito.when(aptDealService.guLawdCdAndDealDateToAtpDto("11110", LocalDate.now().minusDays(1)))
+    private void givenAptDeal(String guLawdCd, LocalDate dealDate) {
+        Mockito.when(aptDealService.guLawdCdAndDealDateToAtpDto(guLawdCd, dealDate))
                 .thenReturn(Arrays.asList(
                         new AptDto("Apt A", 200000000L),
                         new AptDto("Apt B", 100000000L)
