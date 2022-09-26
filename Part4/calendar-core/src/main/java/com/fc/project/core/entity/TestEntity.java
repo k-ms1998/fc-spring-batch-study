@@ -1,8 +1,6 @@
 package com.fc.project.core.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -10,6 +8,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class TestEntity {
 
     @Id
@@ -17,4 +16,8 @@ public class TestEntity {
     private Long id;
 
     private String name;
+
+    public TestEntity(String name) {
+        this.name = name;
+    }
 }
