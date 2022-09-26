@@ -142,3 +142,25 @@ replay_pid*
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java
 Part2/data/output.txt
+
+Part4/calendar-core/build/tmp/jar/MANIFEST.MF
+
+Part4/.gradle/7.1/executionHistory/executionHistory.bin
+
+Part4/.gradle/7.1/executionHistory/executionHistory.lock
+
+Part4/.gradle/7.1/fileHashes/fileHashes.bin
+
+Part4/.gradle/7.1/fileHashes/fileHashes.lock
+
+Part4/.gradle/7.1/fileHashes/resourceHashesCache.bin
+
+Part4/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+
+Part4/.gradle/buildOutputCleanup/outputFiles.bin
+
+Part4/.idea/gradle.xml
+
+Part4/calendar-core/build/tmp/compileJava/previous-compilation-data.bin
+
+Part4/calendar-api/build/tmp/compileJava/previous-compilation-data.bin
