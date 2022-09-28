@@ -164,3 +164,21 @@ Part4/.idea/gradle.xml
 Part4/calendar-core/build/tmp/compileJava/previous-compilation-data.bin
 
 Part4/calendar-api/build/tmp/compileJava/previous-compilation-data.bin
+
+*.bin
+
+Part4/calendar-core/build/test-results/test/TEST-com.fc.project.core.DomainCreateTest.xml
+
+Part4/calendar-core/build/reports/tests/test/classes/com.fc.project.core.DomainCreateTest.html
+
+Part4/calendar-core/build/reports/tests/test/css/base-style.css
+
+Part4/calendar-core/build/reports/tests/test/css/style.css
+
+Part4/calendar-core/build/reports/tests/test/index.html
+
+Part4/calendar-core/build/reports/tests/test/js/report.js
+
+Part4/calendar-core/build/reports/tests/test/packages/com.fc.project.core.html
+
+*.idx
