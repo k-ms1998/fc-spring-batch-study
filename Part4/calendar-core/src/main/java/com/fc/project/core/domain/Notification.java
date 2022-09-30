@@ -1,5 +1,7 @@
 package com.fc.project.core.domain;
 
+import com.fc.project.core.domain.entity.Schedule;
+import com.fc.project.core.domain.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,9 +11,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Notification {
 
-    private Long id;
-    private LocalDateTime notifyAt;
-    private String title;
-    private User user;
-    private LocalDateTime createdAt;
+    private Schedule schedule;
+
+    public Notification(Schedule schedule) {
+        this.schedule = schedule;
+    }
 }

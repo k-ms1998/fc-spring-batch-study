@@ -1,5 +1,7 @@
 package com.fc.project.core.domain;
 
+import com.fc.project.core.domain.entity.Schedule;
+import com.fc.project.core.domain.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,12 +11,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Task {
 
-    private Long id;
-    private LocalDateTime taskAt;
-    private String title;
-    private String description;
-    private User user;
-    private LocalDateTime createdAt;
+    private Schedule schedule;
 
+    public Task(Schedule schedule) {
+        this.schedule = schedule;
+    }
 
 }

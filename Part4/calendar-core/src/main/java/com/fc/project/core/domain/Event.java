@@ -1,5 +1,8 @@
 package com.fc.project.core.domain;
 
+import com.fc.project.core.domain.entity.Engagement;
+import com.fc.project.core.domain.entity.Schedule;
+import com.fc.project.core.domain.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,30 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 public class Event {
 
-    private Long id;
-    private LocalDateTime startAt;
-    private LocalDateTime endAt;
-    private String title;
-    private String description;
-    private User user;
-    private List<Engagement> engagements;
-    private LocalDateTime createdAt;
+    private Schedule schedule;
 
-    public Event(LocalDateTime startAt, LocalDateTime endAt, String title, String description, User user, LocalDateTime createdAt) {
-        this.startAt = startAt;
-        this.endAt = endAt;
-        this.title = title;
-        this.description = description;
-        this.user = user;
-        this.createdAt = createdAt;
-
-        this.engagements = new ArrayList<>();
-    }
-
-    public void addEngagements(Engagement engagement) {
-        if (engagements == null) {
-            engagements = new ArrayList<>();
-        }
-        engagements.add(engagement);
+    public Event(Schedule schedule) {
+        this.schedule = schedule;
     }
 }
