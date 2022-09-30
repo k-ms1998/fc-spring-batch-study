@@ -1,32 +1,34 @@
 package com.fc.project.core;
 
-import com.fc.project.core.domain.Engagement;
+import com.fc.project.core.domain.entity.Engagement;
 import com.fc.project.core.domain.Event;
-import com.fc.project.core.domain.RequestStatus;
-import com.fc.project.core.domain.User;
+import com.fc.project.core.domain.entity.Schedule;
+import com.fc.project.core.domain.enums.RequestStatus;
+import com.fc.project.core.domain.entity.User;
+import com.fc.project.core.domain.enums.ScheduleType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@EnableJpaAuditing
 public class DomainCreateTest {
 
     @Test
     void given_when_thenCreateEvent() throws Exception {
         // Given
-        final User writer = new User("writer", "writer@email.com", "password_writer",
-                LocalDate.of(1998, 1, 1), LocalDateTime.now());
-        final User attendee = new User("attendee", "attendee@email.com", "password_attendee",
-                LocalDate.of(1998, 1, 1), LocalDateTime.now());
-        final Event event = new Event(LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1),
-                "title", "description", writer, LocalDateTime.now());
-        event.addEngagements(new Engagement(event, attendee, LocalDateTime.now(), RequestStatus.REQUESTED));
+        final User user = new User("me", "me@email.com", "myPassword", LocalDate.of(1998, 1, 1));
+        final Schedule taskSchedule = Schedule.task("Task", "Clean Up", LocalDateTime.now(), LocalDateTime.now().plusDays(1), user);
 
         // When
 
         // Then
-        Assertions.assertEquals(event.getEngagements().get(0).getAttendee().getName(), "attendee");
+        Assertions.assertEquals(taskSchedule.getScheduleType(), ScheduleType.TASK);
+        Assertions.assertEquals(taskSchedule.getTitle().equals("Task"), true);
+        Assertions.assertEquals(taskSchedule.getDescription().equals("Clean Up"), true);
+        System.out.println("taskSchedule.getCreatedAt() = " + taskSchedule.getCreatedAt());
 
     }
 }
