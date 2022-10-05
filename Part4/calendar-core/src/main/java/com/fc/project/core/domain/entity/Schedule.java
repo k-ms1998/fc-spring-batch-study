@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(access = AccessLevel.PACKAGE)
-public class Schedule {
+public class Schedule extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,8 +36,6 @@ public class Schedule {
     @Enumerated(EnumType.STRING)
     private ScheduleType scheduleType;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
 
     public static Schedule event(String title, String description, LocalDateTime startAt, LocalDateTime endAt, User user) {
         return Schedule.builder()

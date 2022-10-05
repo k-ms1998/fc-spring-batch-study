@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Engagement {
+public class Engagement extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +26,11 @@ public class Engagement {
     @JoinColumn(name = "attendee_id")
     private User attendee;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
     private RequestStatus requestStatus;
 
-    public Engagement(Schedule schedule, User attendee, LocalDateTime createdAt, RequestStatus requestStatus) {
+    public Engagement(Schedule schedule, User attendee, RequestStatus requestStatus) {
         this.schedule = schedule;
         this.attendee = attendee;
-        this.createdAt = createdAt;
         this.requestStatus = requestStatus;
     }
 }
