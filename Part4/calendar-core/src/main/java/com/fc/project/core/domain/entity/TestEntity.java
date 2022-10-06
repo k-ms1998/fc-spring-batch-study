@@ -1,4 +1,4 @@
-package com.fc.project.core.entity;
+package com.fc.project.core.domain.entity;
 
 import lombok.*;
 
