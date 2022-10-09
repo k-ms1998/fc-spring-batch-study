@@ -21,7 +21,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class LoginService {
 
-    private final static String LOGIN_SESSION_KEY = "USER_ID";
+    public final static String LOGIN_SESSION_KEY = "USER_ID";
     private final UserService userService;
 
     /**
@@ -55,7 +55,7 @@ public class LoginService {
             return;
         }
 
-        final Optional<User> user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getEmail());
+        final Optional<User> user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
 
         if (user.isPresent()) {
             session.setAttribute(LOGIN_SESSION_KEY, user.get().getId());
