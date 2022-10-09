@@ -21,7 +21,7 @@ import java.util.*;
 @EnableJpaRepositories("com.fc.project.core")
 @EnableJpaAuditing
 @RestController
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.fc.project")
 public class ApiApplication {
 
     private final TestEntityRepository testEntityRepository;
