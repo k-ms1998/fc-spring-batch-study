@@ -188,3 +188,7 @@ Part4/calendar-core/build/test-results/test/TEST-com.fc.project.core.util.BCrypt
 Part4/calendar-core/build/reports/tests/test/classes/
 
 Part4/calendar-core/build/reports/tests/test/packages/
+
+Part4/.gradle/checksums/
+
+Part4/.gradle/7.1/dependencies-accessors/
