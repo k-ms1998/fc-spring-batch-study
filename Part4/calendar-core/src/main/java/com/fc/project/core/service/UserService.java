@@ -41,4 +41,9 @@ public class UserService {
                 userCreateRequest.getBirthDay()
         );
     }
+
+    public User findByUserIdOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User Not Found."));
+    }
 }

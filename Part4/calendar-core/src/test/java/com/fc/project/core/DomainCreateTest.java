@@ -20,7 +20,7 @@ public class DomainCreateTest {
     void given_when_thenCreateEvent() throws Exception {
         // Given
         final User user = new User("me", "me@email.com", "myPassword", LocalDate.of(1998, 1, 1));
-        final Schedule taskSchedule = Schedule.task("Task", "Clean Up", LocalDateTime.now(), LocalDateTime.now().plusDays(1), user);
+        final Schedule taskSchedule = Schedule.task("Task", "Clean Up", LocalDateTime.now(), user);
 
         // When
 

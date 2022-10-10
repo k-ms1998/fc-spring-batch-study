@@ -58,12 +58,11 @@ public class Schedule extends BaseEntity{
                 .build();
     }
 
-    public static Schedule task(String title, String description, LocalDateTime startAt, LocalDateTime endAt, User user) {
+    public static Schedule task(String title, String description, LocalDateTime taskAt, User user) {
         return Schedule.builder()
                 .title(title)
                 .description(description)
-                .startAt(startAt)
-                .endAt(endAt)
+                .startAt(taskAt)
                 .user(user)
                 .scheduleType(ScheduleType.TASK)
                 .build();
