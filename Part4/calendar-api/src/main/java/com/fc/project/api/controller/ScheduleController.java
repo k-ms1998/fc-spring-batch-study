@@ -22,14 +22,12 @@ public class ScheduleController {
     private final TaskService taskService;
 
     @PostMapping("/tasks")
-    public ResponseEntity<Void> createTask(@RequestBody TaskCreateRequest taskCreateRequest, HttpSession httpSession) {
-        /*
-        로그인 했는지 확인
+    public ResponseEntity<Void> createTask(@RequestBody TaskCreateRequest taskCreateRequest, HttpSession httpSession,
+                                           AuthUser authUser) {
+        /**
+         * AuthUserResolver 을 이용해서 AuthUser 를 파라미터로 넘겨줄때 로그인한 상태인지 아닌지 확인
+         *
          */
-        final Long userId = (Long) httpSession.getAttribute(LOGIN_SESSION_KEY);
-        if (userId == null) {
-            throw new RuntimeException("Bad request. No session");
-        }
 
         /**
          * userId 를 그대로 넘겨주기 않고, DTO 로 한번 변환해서 AuthUser 로 넘겨줌
@@ -37,7 +35,7 @@ public class ScheduleController {
          *  => 그러므로, DTO 로 변환해서 넘겨줌
          * 모든 변수에 대해서 이럴 필요는 없고, TaskService 같은 어플리케이션 로직에서는 DTO 로 변환해주는걸 추천
          */
-        taskService.create(taskCreateRequest, AuthUser.of(userId));
+        taskService.create(taskCreateRequest, authUser);
 
         return ResponseEntity.ok().build();
     }
