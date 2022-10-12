@@ -19,4 +19,16 @@ public class Event {
     public Event(Schedule schedule) {
         this.schedule = schedule;
     }
+
+    public LocalDateTime getStartAt() {
+        return this.schedule.getStartAt();
+    }
+
+    public LocalDateTime getEndAt() {
+        return this.schedule.getEndAt();
+    }
+
+    public boolean isOverlapped(LocalDateTime startAt, LocalDateTime endAt) {
+        return this.getStartAt().isBefore(endAt) && startAt.isBefore(this.getEndAt());
+    }
 }

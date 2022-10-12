@@ -4,15 +4,15 @@ import com.fc.project.core.domain.Event;
 import com.fc.project.core.domain.enums.RequestStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import lombok.ToString;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class Engagement extends BaseEntity{
+@ToString(of = {"id", "requestStatus"})
+public class Engagement extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +26,7 @@ public class Engagement extends BaseEntity{
     @JoinColumn(name = "attendee_id")
     private User attendee;
 
+    @Enumerated(EnumType.STRING)
     private RequestStatus requestStatus;
 
     public Engagement(Schedule schedule, User attendee, RequestStatus requestStatus) {
