@@ -8,6 +8,8 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Getter
 @Setter
@@ -19,11 +21,28 @@ public class NotificationCreateRequest {
     private final RepeatInfo repeatInfo;
 
     public List<LocalDateTime> createNotifyAtList() {
-        if (repeatInfo == null) {
-            return Collections.singletonList(notifyAt);
+        if (this.repeatInfo == null) {
+            return Collections.singletonList(this.notifyAt);
         }
 
-        return null;
+        return IntStream.range(0, this.repeatInfo.getTimes())
+                .mapToObj(i -> {
+                    int intervalValue = this.repeatInfo.getInterval().getIntervalValue();
+                    IntervalUnit intervalUnit = this.repeatInfo.getInterval().getIntervalUnit();
+
+                    switch (intervalUnit) {
+                        case DAY:
+                            return this.notifyAt.plusDays(intervalValue * i);
+                        case WEEK:
+                            return this.notifyAt.plusWeeks(intervalValue * i);
+                        case MONTH:
+                            return this.notifyAt.plusMonths(intervalValue * i);
+                        case YEAR:
+                            return this.notifyAt.plusYears(intervalValue * i);
+                        default:
+                            throw new RuntimeException("Bad Request. Invalid Interval Unit.");
+                    }
+                }).collect(Collectors.toList());
     }
 
     @Getter
