@@ -4,11 +4,13 @@ import com.fc.project.core.domain.Event;
 import com.fc.project.core.domain.Notification;
 import com.fc.project.core.domain.Task;
 import com.fc.project.core.domain.enums.ScheduleType;
+import com.fc.project.core.util.Period;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -77,6 +79,10 @@ public class Schedule extends BaseEntity{
 
     public Task toTask() {
         return new Task(this);
+    }
+
+    public boolean isOverlapped(LocalDate date){
+        return Period.of(this.getStartAt(), this.getEndAt()).isOverlapped(date);
     }
 
 }

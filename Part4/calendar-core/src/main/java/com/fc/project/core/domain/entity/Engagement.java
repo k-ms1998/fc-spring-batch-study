@@ -2,11 +2,13 @@ package com.fc.project.core.domain.entity;
 
 import com.fc.project.core.domain.Event;
 import com.fc.project.core.domain.enums.RequestStatus;
+import com.fc.project.core.util.Period;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
@@ -33,5 +35,9 @@ public class Engagement extends BaseEntity {
         this.schedule = schedule;
         this.attendee = attendee;
         this.requestStatus = requestStatus;
+    }
+
+    public boolean isOverlapped(LocalDate date){
+        return this.getSchedule().isOverlapped(date);
     }
 }

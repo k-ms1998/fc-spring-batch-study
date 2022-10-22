@@ -4,17 +4,21 @@ import com.fc.project.api.dto.AuthUser;
 import com.fc.project.api.dto.EventCreateRequest;
 import com.fc.project.api.dto.NotificationCreateRequest;
 import com.fc.project.api.dto.TaskCreateRequest;
+import com.fc.project.api.dto.scheduleDto.ScheduleDto;
 import com.fc.project.api.service.EventService;
 import com.fc.project.api.service.NotificationService;
+import com.fc.project.api.service.ScheduleQueryService;
 import com.fc.project.api.service.TaskService;
+import com.fc.project.core.domain.entity.Schedule;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import static com.fc.project.api.service.LoginService.LOGIN_SESSION_KEY;
 
@@ -26,6 +30,13 @@ public class ScheduleController {
     private final TaskService taskService;
     private final EventService eventService;
     private final NotificationService notificationService;
+    private final ScheduleQueryService scheduleQueryService;
+
+    @GetMapping("/day")
+    public List<ScheduleDto> getSchedulesByDay(AuthUser authUser,
+                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) { // yyyy-MM-DD
+        return scheduleQueryService.getScheduleByDay(authUser, date == null ? LocalDate.now() : date);
+    }
 
     @PostMapping("/tasks")
     public ResponseEntity<Void> createTask(@RequestBody TaskCreateRequest taskCreateRequest, HttpSession httpSession,
