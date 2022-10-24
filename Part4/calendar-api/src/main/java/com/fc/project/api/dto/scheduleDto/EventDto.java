@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class EventDto implements ScheduleDto{
 
     private final Long scheduleId;

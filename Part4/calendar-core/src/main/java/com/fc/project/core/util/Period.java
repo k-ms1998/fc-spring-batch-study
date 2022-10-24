@@ -8,11 +8,15 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
-@RequiredArgsConstructor
 public class Period {
 
     private final LocalDateTime startAt;
     private final LocalDateTime endAt;
+
+    public Period(LocalDateTime startAt, LocalDateTime endAt) {
+        this.startAt = startAt != null ? startAt : LocalDateTime.now();
+        this.endAt = endAt != null ? endAt : this.startAt;
+    }
 
     public static Period of(LocalDateTime startAt, LocalDateTime endAt) {
         return new Period(startAt, endAt);
