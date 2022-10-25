@@ -22,6 +22,10 @@ public class Period {
         return new Period(startAt, endAt);
     }
 
+    public static Period of(LocalDate startDate, LocalDate endDate) {
+        return new Period(startDate.atStartOfDay(), LocalDateTime.of(endDate, LocalTime.of(23, 59, 59, 999)));
+    }
+
     public boolean isOverlapped(LocalDate date) {
         return this.isOverlapped(
                 date.atStartOfDay(), LocalDateTime.of(date, LocalTime.of(23, 59, 59, 999))
@@ -31,5 +35,9 @@ public class Period {
     public boolean isOverlapped(LocalDateTime startAt, LocalDateTime endAt) {
         return this.startAt.isBefore(endAt)
                 && startAt.isBefore(this.endAt);
+    }
+
+    public boolean isOverlapped(Period period) {
+        return isOverlapped(period.startAt, period.endAt);
     }
 }

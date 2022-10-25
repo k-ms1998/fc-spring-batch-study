@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import static com.fc.project.api.service.LoginService.LOGIN_SESSION_KEY;
@@ -36,6 +37,16 @@ public class ScheduleController {
     public List<ScheduleDto> getSchedulesByDay(AuthUser authUser,
                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) { // yyyy-MM-DD
         return scheduleQueryService.getScheduleByDay(authUser, date == null ? LocalDate.now() : date);
+    }
+    @GetMapping("/week")
+    public List<ScheduleDto> getSchedulesByWeek(AuthUser authUser,
+                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startOfWeek) { // yyyy-MM-DD
+        return scheduleQueryService.getScheduleByWeek(authUser, startOfWeek == null ? LocalDate.now() : startOfWeek);
+    }
+    @GetMapping("/month")
+    public List<ScheduleDto> getSchedulesByMonth(AuthUser authUser,
+                                               @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") String yearMonth) { // yyyy-MM
+        return scheduleQueryService.getScheduleByMonth(authUser, yearMonth == null ? YearMonth.now() : YearMonth.parse(yearMonth));
     }
 
     @PostMapping("/tasks")
