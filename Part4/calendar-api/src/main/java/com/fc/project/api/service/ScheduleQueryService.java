@@ -27,48 +27,28 @@ public class ScheduleQueryService {
     private final EngagementRepository engagementRepository;
 
     public List<ScheduleDto> getScheduleByDay(AuthUser authUser, LocalDate date) {
-        final Stream<ScheduleDto> schedules =
-                scheduleRepository.findAllByUserId(authUser.getId()).stream()
-                .filter(s -> s.isOverlapped(date))
-                .map(s -> DtoConverter.fromSchedule(s));
-
-        final Stream<ScheduleDto> engagements =
-                engagementRepository.findByAttendeeId(authUser.getId()).stream()
-                .filter(e -> e.isOverlapped(date))
-                .map(e -> DtoConverter.fromSchedule(e.getSchedule()));
-
-
-        return Stream.concat(schedules, engagements)
-                .collect(Collectors.toList());
+        return getSchedulesAndEngagementsByPeriod(authUser.getId(),
+                Period.of(date));
     }
 
     public List<ScheduleDto> getScheduleByWeek(AuthUser authUser, LocalDate startOfWeek) {
-        final Period period = Period.of(startOfWeek, startOfWeek.plusDays(6));
-
-        final Stream<ScheduleDto> schedules =
-                scheduleRepository.findAllByUserId(authUser.getId()).stream()
-                        .filter(s -> s.isOverlapped(period))
-                        .map(s -> DtoConverter.fromSchedule(s));
-
-        final Stream<ScheduleDto> engagements =
-                engagementRepository.findByAttendeeId(authUser.getId()).stream()
-                        .filter(e -> e.isOverlapped(period))
-                        .map(e -> DtoConverter.fromSchedule(e.getSchedule()));
-
-        return Stream.concat(schedules, engagements)
-                .collect(Collectors.toList());
+        return getSchedulesAndEngagementsByPeriod(authUser.getId(),
+                Period.of(startOfWeek, startOfWeek.plusDays(6)));
     }
 
     public List<ScheduleDto> getScheduleByMonth(AuthUser authUser, YearMonth yearMonth) {
-        final Period period = Period.of(yearMonth.atDay(1), yearMonth.atEndOfMonth());
+        return getSchedulesAndEngagementsByPeriod(authUser.getId(),
+                Period.of(yearMonth.atDay(1), yearMonth.atEndOfMonth()));
+    }
 
+    private List<ScheduleDto> getSchedulesAndEngagementsByPeriod(Long userId, Period period) {
         final Stream<ScheduleDto> schedules =
-                scheduleRepository.findAllByUserId(authUser.getId()).stream()
+                scheduleRepository.findAllByUserId(userId).stream()
                         .filter(s -> s.isOverlapped(period))
                         .map(s -> DtoConverter.fromSchedule(s));
 
         final Stream<ScheduleDto> engagements =
-                engagementRepository.findByAttendeeId(authUser.getId()).stream()
+                engagementRepository.findByAttendeeId(userId).stream()
                         .filter(e -> e.isOverlapped(period))
                         .map(e -> DtoConverter.fromSchedule(e.getSchedule()));
 

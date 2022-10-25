@@ -18,6 +18,10 @@ public class Period {
         this.endAt = endAt != null ? endAt : this.startAt;
     }
 
+    public static Period of(LocalDate date) {
+        return new Period(date.atStartOfDay(), LocalDateTime.of(date, LocalTime.of(23, 59, 59, 99)));
+    }
+
     public static Period of(LocalDateTime startAt, LocalDateTime endAt) {
         return new Period(startAt, endAt);
     }
