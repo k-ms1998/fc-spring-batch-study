@@ -6,6 +6,8 @@ import com.fc.project.api.dto.scheduleDto.ScheduleDto;
 import com.fc.project.api.dto.scheduleDto.TaskDto;
 import com.fc.project.core.domain.entity.Schedule;
 import com.fc.project.core.domain.enums.ScheduleType;
+import com.fc.project.core.exception.CalendarException;
+import com.fc.project.core.exception.ErrorCode;
 
 public abstract class DtoConverter {
 
@@ -21,7 +23,7 @@ public abstract class DtoConverter {
                 return new NotificationDto(schedule.getId(), schedule.getStartAt(),
                         schedule.getTitle(), schedule.getUser().getId());
             default:
-                throw new RuntimeException("Bad Request. Non-existent Schedule Type");
+                throw new CalendarException(ErrorCode.BAD_REQUEST);
         }
     }
 }

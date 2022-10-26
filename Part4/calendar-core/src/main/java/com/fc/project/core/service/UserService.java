@@ -2,6 +2,8 @@ package com.fc.project.core.service;
 
 import com.fc.project.core.domain.entity.User;
 import com.fc.project.core.dto.UserCreateRequest;
+import com.fc.project.core.exception.CalendarException;
+import com.fc.project.core.exception.ErrorCode;
 import com.fc.project.core.repository.UserRepository;
 import com.fc.project.core.util.Encryptor;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ public class UserService {
     public User create(UserCreateRequest userCreateRequest) {
         userRepository.findByEmail(userCreateRequest.getEmail())
                 .ifPresent(user -> {
-                    throw new RuntimeException("User Already Exists");
+                    throw new CalendarException(ErrorCode.USER_ALREADY_EXISTS);
                 });
 
         return userRepository.save(userCreateRequestToUser(userCreateRequest));
@@ -44,6 +46,6 @@ public class UserService {
 
     public User findByUserIdOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User Not Found."));
+                .orElseThrow(() -> new CalendarException(ErrorCode.USER_NOT_FOUND));
     }
 }

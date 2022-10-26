@@ -4,6 +4,8 @@ import com.fc.project.api.dto.LoginRequest;
 import com.fc.project.api.dto.SignUpRequest;
 import com.fc.project.core.domain.entity.User;
 import com.fc.project.core.dto.UserCreateRequest;
+import com.fc.project.core.exception.CalendarException;
+import com.fc.project.core.exception.ErrorCode;
 import com.fc.project.core.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -60,7 +62,7 @@ public class LoginService {
         if (user.isPresent()) {
             session.setAttribute(LOGIN_SESSION_KEY, user.get().getId());
         }else{
-            throw new RuntimeException("Password or Email Doesn't Match");
+            throw new CalendarException(ErrorCode.PASSWORD_NOT_MATCH);
         }
     }
 

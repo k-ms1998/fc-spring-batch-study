@@ -1,6 +1,8 @@
 package com.fc.project.api.config;
 
 import com.fc.project.api.dto.AuthUser;
+import com.fc.project.core.exception.CalendarException;
+import com.fc.project.core.exception.ErrorCode;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -33,7 +35,7 @@ public class AuthUserResolver implements HandlerMethodArgumentResolver {
             /**
              * 로그인이 되지 않은 상태
              */
-            throw new RuntimeException("Bad request. No session");
+            throw new CalendarException(ErrorCode.BAD_REQUEST);
 
         }
 

@@ -6,6 +6,8 @@ import com.fc.project.core.domain.entity.Engagement;
 import com.fc.project.core.domain.entity.Schedule;
 import com.fc.project.core.domain.entity.User;
 import com.fc.project.core.domain.enums.RequestStatus;
+import com.fc.project.core.exception.CalendarException;
+import com.fc.project.core.exception.ErrorCode;
 import com.fc.project.core.repository.EngagementRepository;
 import com.fc.project.core.repository.ScheduleRepository;
 import com.fc.project.core.service.UserService;
@@ -42,7 +44,7 @@ public class EventService {
                 .filter(e -> e.isOverlapped(eventCreateRequest.getStartAt(), eventCreateRequest.getEndAt()))
                 .count();
         if (overlappingEngagementsCount > 0L) {
-            throw new RuntimeException("Overlapping Engagements");
+            throw new CalendarException(ErrorCode.EVENT_CREATE_OVERLAPPED);
         }
 
         final Schedule eventSchedule = Schedule.event(

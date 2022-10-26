@@ -1,6 +1,8 @@
 package com.fc.project.api.dto;
 
 import com.fc.project.core.domain.enums.IntervalUnit;
+import com.fc.project.core.exception.CalendarException;
+import com.fc.project.core.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +42,7 @@ public class NotificationCreateRequest {
                         case YEAR:
                             return this.notifyAt.plusYears(intervalValue * i);
                         default:
-                            throw new RuntimeException("Bad Request. Invalid Interval Unit.");
+                            throw new CalendarException(ErrorCode.BAD_REQUEST);
                     }
                 }).collect(Collectors.toList());
     }

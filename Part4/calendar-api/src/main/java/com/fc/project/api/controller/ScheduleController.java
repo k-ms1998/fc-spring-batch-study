@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -69,7 +70,7 @@ public class ScheduleController {
     }
 
     @PostMapping("/events")
-    public ResponseEntity<Void> createEvent(@RequestBody EventCreateRequest eventCreateRequest, HttpSession httpSession,
+    public ResponseEntity<Void> createEvent(@Valid @RequestBody EventCreateRequest eventCreateRequest, HttpSession httpSession,
                                             AuthUser authUser) {
         /**
          * AuthUserResolver 을 이용해서 AuthUser 를 파라미터로 넘겨줄때 로그인한 상태인지 아닌지 확인
