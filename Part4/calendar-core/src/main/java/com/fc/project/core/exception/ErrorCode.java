@@ -1,5 +1,8 @@
 package com.fc.project.core.exception;
 
+import lombok.Getter;
+
+@Getter
 public enum ErrorCode {
     PASSWORD_NOT_MATCH("Password does not match."),
     USER_ALREADY_EXISTS("User already exists."),
