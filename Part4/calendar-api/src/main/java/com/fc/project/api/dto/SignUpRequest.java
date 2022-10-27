@@ -19,11 +19,11 @@ public class SignUpRequest {
     @NotBlank
     private final String email;
 
-    @Size(min = 6, message = "4자리 이상 입력해주세요.")
+    @Size(min = 4, message = "4자리 이상 입력해주세요.")
     @NotBlank
     private final String password;
 
-    @NotBlank
+//    @NotBlank
     private final LocalDate birthDay;
 
     public SignUpRequest(String name, String email, String password, LocalDate birthDay) {
