@@ -1,26 +1,27 @@
-package com.fc.project.api.controller;
+package com.fc.project.api.controller.dev;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.internet.MimeMessage;
+import java.util.HashMap;
+import java.util.Map;
 
-@RestController
-@RequestMapping("/email")
+@Controller
+@RequestMapping("/test/email")
 @RequiredArgsConstructor
-public class EmailController {
+public class TestEmailController {
 
     private final JavaMailSender emailSender;
 
     @GetMapping("/sendTest")
-    public void sendTestMail(@RequestParam(required = false) String recipient) {
+    public @ResponseBody
+    void sendTestMail(@RequestParam(required = false) String recipient) {
         final MimeMessagePreparator preparator = (MimeMessage mimeMessage) -> {
             final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
             helper.setTo(recipient);
