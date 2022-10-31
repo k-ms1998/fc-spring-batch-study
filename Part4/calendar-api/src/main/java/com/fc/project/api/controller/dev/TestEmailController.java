@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.internet.MimeMessage;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -30,5 +31,19 @@ public class TestEmailController {
         };
 
         emailSender.send(preparator);
+    }
+
+    @GetMapping("/template")
+    public String testTemplateEngagementEmail(Model model) {
+        final Map<String, Object> props = new HashMap<>();
+        props.put("title", "타이틀입니다~");
+        props.put("calendar", "sample@gmail.com");
+        props.put("period", "기간");
+        props.put("attendees", List.of("user1@mail.io", "user2@mail.io", "user3@mail.io"));
+        props.put("acceptUrl", "http://localhost:8080");
+        props.put("rejectUrl", "http://localhost:8080");
+        model.addAllAttributes(props);
+
+        return "engagement-email";
     }
 }
