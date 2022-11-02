@@ -2,12 +2,14 @@ package com.fc.project.core.util;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
+@ToString
 public class Period {
 
     private final LocalDateTime startAt;

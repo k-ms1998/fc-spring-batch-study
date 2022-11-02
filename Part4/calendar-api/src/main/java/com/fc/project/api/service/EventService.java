@@ -1,6 +1,7 @@
 package com.fc.project.api.service;
 
 import com.fc.project.api.dto.AuthUser;
+import com.fc.project.api.dto.EngagementEmail;
 import com.fc.project.api.dto.EventCreateRequest;
 import com.fc.project.core.domain.entity.Engagement;
 import com.fc.project.core.domain.entity.Schedule;
@@ -11,10 +12,12 @@ import com.fc.project.core.exception.ErrorCode;
 import com.fc.project.core.repository.EngagementRepository;
 import com.fc.project.core.repository.ScheduleRepository;
 import com.fc.project.core.service.UserService;
+import com.fc.project.core.util.Period;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,13 +56,23 @@ public class EventService {
 
         scheduleRepository.save(eventSchedule);
 
-        eventCreateRequest.getAttendeeIds().forEach(id -> {
-            System.out.println("id = " + id);
-            final User attendee = userService.findByUserIdOrThrow(id);
-            final Engagement engagement = new Engagement(eventSchedule, attendee, RequestStatus.ACCEPTED);
+        final List<User> attendees = eventCreateRequest.getAttendeeIds().stream()
+                .map(id -> userService.findByUserIdOrThrow(id))
+                .collect(Collectors.toList());
+        final List<String> attendeeEmails = attendees.stream().map(u -> u.getEmail())
+                .collect(Collectors.toList());
+
+        attendees.forEach(u -> {
+            final Engagement engagement = new Engagement(eventSchedule, u, RequestStatus.REQUESTED);
 
             engagementRepository.save(engagement);
-            emailService.sendEngagement(engagement);
+            emailService.sendEngagement(EngagementEmail.builder()
+                    .engagementId(engagement.getId())
+                    .title(engagement.getSchedule().getTitle())
+                    .recipient(engagement.getAttendee().getEmail())
+                    .attendeeEmails(attendeeEmails)
+                    .period(engagement.getPeriod())
+                    .build());
         });
     }
 

@@ -1,16 +1,12 @@
 package com.fc.project.api.controller;
 
-import com.fc.project.api.dto.AuthUser;
-import com.fc.project.api.dto.EventCreateRequest;
-import com.fc.project.api.dto.NotificationCreateRequest;
-import com.fc.project.api.dto.TaskCreateRequest;
+import com.fc.project.api.dto.*;
 import com.fc.project.api.dto.scheduleDto.ScheduleDto;
-import com.fc.project.api.service.EventService;
-import com.fc.project.api.service.NotificationService;
-import com.fc.project.api.service.ScheduleQueryService;
-import com.fc.project.api.service.TaskService;
+import com.fc.project.api.service.*;
 import com.fc.project.core.domain.entity.Schedule;
+import com.fc.project.core.domain.enums.RequestStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +20,7 @@ import java.util.List;
 
 import static com.fc.project.api.service.LoginService.LOGIN_SESSION_KEY;
 
+@Slf4j
 @RestController
 @RequestMapping("/schedules")
 @RequiredArgsConstructor
@@ -33,20 +30,23 @@ public class ScheduleController {
     private final EventService eventService;
     private final NotificationService notificationService;
     private final ScheduleQueryService scheduleQueryService;
+    private final EngagementService engagementService;
 
     @GetMapping("/day")
     public List<ScheduleDto> getSchedulesByDay(AuthUser authUser,
                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) { // yyyy-MM-DD
         return scheduleQueryService.getScheduleByDay(authUser, date == null ? LocalDate.now() : date);
     }
+
     @GetMapping("/week")
     public List<ScheduleDto> getSchedulesByWeek(AuthUser authUser,
-                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startOfWeek) { // yyyy-MM-DD
+                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startOfWeek) { // yyyy-MM-DD
         return scheduleQueryService.getScheduleByWeek(authUser, startOfWeek == null ? LocalDate.now() : startOfWeek);
     }
+
     @GetMapping("/month")
     public List<ScheduleDto> getSchedulesByMonth(AuthUser authUser,
-                                               @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") String yearMonth) { // yyyy-MM
+                                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") String yearMonth) { // yyyy-MM
         return scheduleQueryService.getScheduleByMonth(authUser, yearMonth == null ? YearMonth.now() : YearMonth.parse(yearMonth));
     }
 
@@ -106,4 +106,11 @@ public class ScheduleController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/events/engagements/{engagementId}")
+    public RequestStatus updateEngagementStatus(@Valid @RequestBody ReplyEngagementRequest type,
+                                                @PathVariable Long engagementId, AuthUser authUser) {
+        return engagementService.update(authUser, engagementId, type.getType());
+    }
+
 }
