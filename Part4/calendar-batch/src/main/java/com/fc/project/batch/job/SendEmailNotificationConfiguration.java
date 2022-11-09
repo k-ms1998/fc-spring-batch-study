@@ -11,6 +11,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
@@ -19,6 +20,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 import java.util.stream.Collectors;
@@ -38,16 +40,24 @@ public class SendEmailNotificationConfiguration {
     public Job sendEmailNotificationJob(Step sendScheduleNotificationStep, Step sendEngagementNotificationStep) {
         return jobBuilderFactory.get("sendEmailNotificationJob")
                 .start(sendScheduleNotificationStep)
-                .start(sendEngagementNotificationStep)
+                .next(sendEngagementNotificationStep)
                 .build();
     }
 
     @Bean
     @JobScope
-    public Step sendScheduleNotificationStep(JdbcCursorItemReader<SendMailBatchRequest> scheduleItemReader, ItemWriter<SendMailBatchRequest> sendNotificationItemWriter) {
+    public Step sendScheduleNotificationStep(JdbcCursorItemReader<SendMailBatchRequest> scheduleItemReader,
+                                             ItemWriter<SendMailBatchRequest> sendNotificationItemWriter) {
         return stepBuilderFactory.get("sendScheduleNotificationStep")
                 .<SendMailBatchRequest, SendMailBatchRequest>chunk(CHUNK_SIZE)
                 .reader(scheduleItemReader)
+                .processor(new ItemProcessor<SendMailBatchRequest, SendMailBatchRequest>() {
+                    @Override
+                    public SendMailBatchRequest process(SendMailBatchRequest item) throws Exception {
+                        System.out.println("----- [PROCESSOR SCHEDULE] -----");
+                        return item;
+                    }
+                })
                 .writer(sendNotificationItemWriter)
                 .allowStartIfComplete(true)
                 .build();
@@ -55,10 +65,18 @@ public class SendEmailNotificationConfiguration {
 
     @Bean
     @JobScope
-    public Step sendEngagementNotificationStep(JdbcCursorItemReader<SendMailBatchRequest> engagementItemReader, ItemWriter<SendMailBatchRequest> sendNotificationItemWriter) {
+    public Step sendEngagementNotificationStep(JdbcCursorItemReader<SendMailBatchRequest> engagementItemReader,
+                                               ItemWriter<SendMailBatchRequest> sendNotificationItemWriter) {
         return stepBuilderFactory.get("sendEngagementNotificationStep")
                 .<SendMailBatchRequest, SendMailBatchRequest>chunk(CHUNK_SIZE)
                 .reader(engagementItemReader)
+                .processor(new ItemProcessor<SendMailBatchRequest, SendMailBatchRequest>() {
+                    @Override
+                    public SendMailBatchRequest process(SendMailBatchRequest item) throws Exception {
+                        System.out.println("----- [PROCESSOR ENGAGEMENT] -----");
+                        return item;
+                    }
+                })
                 .writer(sendNotificationItemWriter)
                 .allowStartIfComplete(true)
                 .build();
@@ -72,7 +90,7 @@ public class SendEmailNotificationConfiguration {
                 .dataSource(dataSource)
                 .rowMapper(new BeanPropertyRowMapper<>(SendMailBatchRequest.class))
                 .sql("SELECT * FROM schedules s INNER JOIN users u ON s.user_id = u.id " +
-                        "WHERE s.start_at >= now() + interval 10 minute " +
+                        "WHERE s.start_at >= now() - interval 10 minute " +
                         "AND s.start_at < now() + interval 11 minute")
                 .build();
     }
@@ -88,18 +106,16 @@ public class SendEmailNotificationConfiguration {
                 .sql("SELECT * FROM engagement e " +
                         "INNER JOIN schedules s ON e.schedule_id = s.id " +
                         "INNER JOIN users u ON s.user_id = u.id " +
-                        "WHERE s.start_at >= now() + interval 10 minute " +
+                        "WHERE s.start_at >= now() - interval 10 minute " +
                         "AND s.start_at < now() + interval 11 minute " +
                         "AND e.request_status = 'ACCEPTED'")
                 .build();
     }
 
     @Bean
-    @StepScope
     public ItemWriter<SendMailBatchRequest> sendNotificationItemWriter() {
-        return s -> log.info("{WRITE ITEMS}" +
-                s.stream()
-                        .map(ss -> ss.toString())
-                        .collect(Collectors.toList()));
+        return s ->
+            new RestTemplate()
+                    .postForObject("http://localhost:8080/batch/mail", s, Object.class);
     }
 }

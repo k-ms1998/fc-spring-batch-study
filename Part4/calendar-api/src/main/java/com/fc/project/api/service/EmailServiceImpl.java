@@ -1,5 +1,6 @@
 package com.fc.project.api.service;
 
+import com.fc.project.api.controller.BatchController;
 import com.fc.project.api.dto.EngagementEmail;
 import com.fc.project.core.domain.entity.Engagement;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,19 @@ public class EmailServiceImpl implements EmailService {
                     templateEngine.process("engagement-email",
                             new Context(Locale.KOREAN, engagementEmail.getProperties())), true
             );
+        };
+
+        emailSender.send(preparator);
+    }
+
+    @Override
+    public void sendNotification(BatchController.SendMailBatchRequest s) {
+        System.out.println("[Send Notification] -> {" + s.toString() + "}");
+        final MimeMessagePreparator preparator = mimeMessage -> {
+            final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+            helper.setTo(s.getEmail());
+            helper.setSubject(s.getTitle());
+            helper.setText(s.toString());
         };
 
         emailSender.send(preparator);
