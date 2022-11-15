@@ -1,0 +1,1 @@
+java -jar C:\Users\pies6\Desktop\Fastcampus\스프링 초격차 2022\Spring_Batch\Code\fc-spring-batch-study\Part4\calendar-batch\build\libs\calendar-batch-0.0.1-SNAPSHOT.jar -Dspring.batch.job.names=sendEmailNotificationJob
