@@ -31,6 +31,7 @@ public class ScheduleController {
     private final NotificationService notificationService;
     private final ScheduleQueryService scheduleQueryService;
     private final EngagementService engagementService;
+    private final ShareService shareService;
 
     @GetMapping("/day")
     public List<ScheduleDto> getSchedulesByDay(AuthUser authUser,
@@ -113,4 +114,14 @@ public class ScheduleController {
         return engagementService.update(authUser, engagementId, type.getType());
     }
 
+
+    @PostMapping("/shares")
+    public void ShareSchedule(AuthUser authUser, @Valid @RequestBody ShareRequest request) {
+        shareService.share(authUser, request);
+    }
+
+    @PutMapping("/shares/{shareId}")
+    public void replyToShareRequest(AuthUser toAuthUser, @PathVariable Long shareId, @Valid @RequestBody ReplyShareRequest request) {
+        shareService.replyToRequest(toAuthUser, shareId, request.getType());
+    }
 }
