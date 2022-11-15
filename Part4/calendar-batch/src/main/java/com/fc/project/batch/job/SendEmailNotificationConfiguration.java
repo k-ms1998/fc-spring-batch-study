@@ -90,7 +90,7 @@ public class SendEmailNotificationConfiguration {
                 .dataSource(dataSource)
                 .rowMapper(new BeanPropertyRowMapper<>(SendMailBatchRequest.class))
                 .sql("SELECT * FROM schedules s INNER JOIN users u ON s.user_id = u.id " +
-                        "WHERE s.start_at >= now() - interval 10 minute " +
+                        "WHERE s.start_at >= now() + interval 5 minute " +
                         "AND s.start_at < now() + interval 11 minute")
                 .build();
     }
@@ -106,7 +106,7 @@ public class SendEmailNotificationConfiguration {
                 .sql("SELECT * FROM engagement e " +
                         "INNER JOIN schedules s ON e.schedule_id = s.id " +
                         "INNER JOIN users u ON s.user_id = u.id " +
-                        "WHERE s.start_at >= now() - interval 10 minute " +
+                        "WHERE s.start_at >= now() + interval 5 minute " +
                         "AND s.start_at < now() + interval 11 minute " +
                         "AND e.request_status = 'ACCEPTED'")
                 .build();
