@@ -13,6 +13,6 @@ public interface ShareRepository extends JpaRepository<Share, Long> {
     @Query("SELECT s FROM Share s WHERE s.requestStatus = :accepted AND s.direction = :biDirectional AND (s.fromUserId = :userId OR s.toUserId = :userId)")
     List<Share> findSharedWithMeBiDirectional(Long userId, RequestStatus accepted, Direction biDirectional);
 
-    @Query("SELECT s FROM Share s WHERE s.requestStatus = :accepted AND s.direction = :uniDirectional AND s.toUserId = :userId")
-    List<Share> findSharedWithMeUniDirectional(Long userId, RequestStatus accepted, Direction uniDirectional);
+    @Query("SELECT s.fromUserId FROM Share s WHERE s.requestStatus = :accepted AND s.direction = :uniDirectional AND s.toUserId = :userId")
+    List<Long> findSharedWithMeUniDirectional(Long userId, RequestStatus accepted, Direction uniDirectional);
 }

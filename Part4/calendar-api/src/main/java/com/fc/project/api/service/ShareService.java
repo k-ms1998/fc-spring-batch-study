@@ -67,8 +67,7 @@ public class ShareService {
                 .map(s -> s.getToUserId().equals(authUser.getId()) ? s.getFromUserId() : s.getToUserId());
         final Stream<Long> sharedWithMeUniDirectional
                 = shareRepository.findSharedWithMeUniDirectional(authUser.getId(), RequestStatus.ACCEPTED, Direction.UNI_DIRECTIONAL)
-                .stream()
-                .map(s -> s.getFromUserId());
+                .stream();
 
 
         return Stream.concat(Stream.of(authUser.getId()), Stream.concat(sharedWithMeBiDirectional, sharedWithMeUniDirectional))
